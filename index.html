@@ -67,13 +67,12 @@ nav.tabs a.active { color:#0a3478; background:var(--accent); border-color:var(--
 .filters select[multiple] { min-height:90px; min-width:160px; }
 .filters select:hover, .filters input:hover { border-color:var(--brand-2); }
 .filters select:focus, .filters input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(240,165,0,.25); }
-.filters .actions { margin-left:auto; display:flex; gap:8px; align-items:flex-end; }
+/* Reset button sits inline with the other .fld controls — no special
+   wrapper. align-items:flex-end on the parent .filters keeps it on the
+   same baseline as the inputs above their labels. */
+.filters .btn { align-self:flex-end; }
 .btn { font:12px inherit; padding:6px 12px; border:1.5px solid var(--brand); border-radius:6px; background:#fff; color:var(--brand); cursor:pointer; font-weight:600; }
 .btn:hover { background:var(--brand); color:#fff; }
-.btn.primary { background:var(--brand); color:#fff; }
-.btn.primary:hover { background:var(--brand-2); border-color:var(--brand-2); }
-.upload-wrap { position:relative; overflow:hidden; display:inline-flex; align-items:center; }
-.upload-wrap input[type=file] { position:absolute; left:-9999px; }
 
 .layout { display:grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap:14px; padding:14px 22px; }
 .layout.layout-single { grid-template-columns: 1fr; }
@@ -134,22 +133,7 @@ table.matrix tbody tr.row-active td { box-shadow: inset 4px 0 0 var(--accent); }
 .leads-section .panel-head .clear-link { color:var(--brand); cursor:pointer; font-size:12px; font-weight:600; text-decoration:underline; }
 .leads-scroll { max-height:460px; overflow:auto; border:1px solid var(--border); border-radius:0 0 10px 10px; background:#fff; }
 table.leads { width:100%; border-collapse:collapse; font-size:12.5px; }
-table.leads thead th { position:sticky; top:0; background:var(--brand); color:#fff; padding:9px 10px; text-align:left; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-bottom:2px solid #0a3478; z-index:2; white-space:nowrap; vertical-align:top; }
-/* Column-header dropdown filter — appears under the header label so the user
-   can narrow the lead list by Stage / Term / Major without leaving the table.
-   Stays sticky with the rest of the thead. */
-table.leads thead th.th-filterable { padding-bottom:5px; }
-table.leads thead th.th-filterable .lbl { margin-bottom:3px; }
-table.leads thead th .col-filter {
-  display:block; width:100%; font:11px inherit; padding:2px 4px;
-  border:1px solid rgba(255,255,255,0.4); border-radius:4px;
-  background:rgba(255,255,255,0.08); color:#fff;
-  text-transform:none; letter-spacing:0; font-weight:500;
-  cursor:pointer;
-}
-table.leads thead th .col-filter:hover { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.7); }
-table.leads thead th .col-filter:focus { outline:none; background:#fff; color:var(--ink); border-color:var(--accent); }
-table.leads thead th .col-filter option { color:#1a2333; background:#fff; }
+table.leads thead th { position:sticky; top:0; background:var(--brand); color:#fff; padding:9px 10px; text-align:left; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-bottom:2px solid #0a3478; z-index:2; white-space:nowrap; }
 table.leads tbody td { padding:7px 10px; border-bottom:1px solid #e1e6ee; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; }
 table.leads tbody tr:nth-child(even) { background:var(--row-alt); }
 table.leads tbody tr:hover { background:#e8eef8; }
@@ -204,28 +188,25 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
 </section>
 
 <section class="filters">
-  <label class="fld">Search Name
-    <input type="text" id="fName" placeholder="First or last name…" autocomplete="off" spellcheck="false" style="min-width:180px">
-  </label>
-  <label class="fld">Intended Term
-    <select id="fTerm" multiple size="3"></select>
-  </label>
-  <label class="fld">Active Stage
-    <select id="fStage" multiple size="3"></select>
-  </label>
   <label class="fld">Created From
     <input type="date" id="fFrom">
   </label>
   <label class="fld">Created To
     <input type="date" id="fTo">
   </label>
-  <div class="actions">
-    <button class="btn" id="btnReset">Reset filters</button>
-    <label class="btn primary upload-wrap">
-      Upload fresh CSV
-      <input type="file" id="csvFile" accept=".csv">
-    </label>
-  </div>
+  <label class="fld">Search Name
+    <input type="text" id="fName" placeholder="First or last name…" autocomplete="off" spellcheck="false" style="min-width:180px">
+  </label>
+  <label class="fld">Active Stage
+    <select id="fStage" multiple size="3"></select>
+  </label>
+  <label class="fld">Intended Term
+    <select id="fTerm" multiple size="3"></select>
+  </label>
+  <label class="fld">Intended Major
+    <select id="fMajor"></select>
+  </label>
+  <button class="btn" id="btnReset">Reset filters</button>
 </section>
 
 <section class="leads-section">
@@ -233,7 +214,6 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
     <h2>Lead Detail <span class="badge" id="leadCount">0 leads</span></h2>
     <div class="ctrls">
       <span class="clear-link" id="clearCell" style="display:none">Clear cell selection</span>
-      <button class="btn" id="btnExport">Export to CSV</button>
     </div>
   </div>
   <div class="leads-scroll">
@@ -243,9 +223,9 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
         <th></th>
         <th>Last Name</th>
         <th>First Name</th>
-        <th class="th-filterable"><div class="lbl">Stage</div><select class="col-filter" id="hfStage"></select></th>
-        <th class="th-filterable"><div class="lbl">Term</div><select class="col-filter" id="hfTerm"></select></th>
-        <th class="th-filterable"><div class="lbl">Major</div><select class="col-filter" id="hfMajor"></select></th>
+        <th>Stage</th>
+        <th>Term</th>
+        <th>Major</th>
         <th>Referred By</th>
         <th>Last Activity</th>
       </tr></thead>
@@ -2530,7 +2510,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 12/28/2025,Testdownload,MD,2-PROSPECT,January 2026,Clinical Medicine Program (CMP),deepti.mankar@ausoma.org,ausoma.forms.7172,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,,6950ac4207b57954db0a57b5
 12/31/2025,Kathomias,Turnage,APPLICATION_START,,,katurnagemed1@gmail.com,,,02/24/2026,emailDelivered,,,6955217382739c97f00cc706
 01/01/2026,Saba,Mirzaeian Aghamahalli,APPLICATION_START,,,saba.mirzaeian@yahoo.com,,,02/24/2026,emailOpened,,,6956ddbf176e63c8c10f6d85
-01/01/2026,ShanN,Smith,APPLICATION_START,,,shannsmith0285@gmail.com,,,02/19/2026,smsDelivered,,,695708381a64a9a74d08adf8
+01/01/2026,ShanN,Smith,APPLICATION_START,September 2026,,shannsmith0285@gmail.com,,,02/19/2026,smsDelivered,,,695708381a64a9a74d08adf8
 01/08/2026,David,Tran,APPLICATION_START,September 2026,,berkeleypublichealth@gmail.com,,,02/19/2026,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,695f3accd8414506490a80b3
 01/13/2026,Stephany,Pinto,APPLICATION_START,September 2026,,stephcpinto02@gmail.com,,,03/17/2026,emailDelivered,,,6965d1ba86153194b8067188
 01/15/2026,George,Romley,2-PROSPECT,2026 and Beyond,4 Year MD Program,mrgccg78730@gmail.com,ausoma.forms.7888,,02/19/2026,emailOpened,66ba570d99100a2a2a0b2f32,,696953eb833e09739a0bb489
@@ -2617,6 +2597,13 @@ function parseCSV(text) {
 const MONTH_TO_NUM = { January: 1, May: 5, September: 9 };
 const NUM_TO_SEASON = { 1: 'Spring', 5: 'Summer', 9: 'Fall' };
 
+// Sentinel value used in <option value=...> and cell data-term attributes to
+// represent "the user explicitly wants blank-term records". We can't use ''
+// directly because '' is already overloaded to mean "any term" in the Total
+// row's cell selection (clicking a column total filters to that stage across
+// all terms — that uses data-term="").
+const BLANK_TERM_VALUE = '__BLANK__';
+
 function parseTerm(t) {
   // returns { sortKey: yyyymm or Infinity, label: 'Summer 2026' or original, isStandard: bool }
   if (!t) return { sortKey: 1e9 + 1, label: '(blank)', isStandard: false };
@@ -2700,22 +2687,15 @@ const els = {
   name: document.getElementById('fName'),
   term: document.getElementById('fTerm'),
   stage: document.getElementById('fStage'),
+  major: document.getElementById('fMajor'),
   from: document.getElementById('fFrom'),
   to: document.getElementById('fTo'),
-  // Column-header dropdowns — local filters that narrow the lead list only,
-  // they do not affect the matrix or KPI counts.
-  hfStage: document.getElementById('hfStage'),
-  hfTerm:  document.getElementById('hfTerm'),
-  hfMajor: document.getElementById('hfMajor'),
   reset: document.getElementById('btnReset'),
-  file: document.getElementById('csvFile'),
   matrix: document.getElementById('matrix'),
-  donut: document.getElementById('donut'),
   conv: document.getElementById('convTable'),
   leadsBody: document.querySelector('#leadsTable tbody'),
   leadCount: document.getElementById('leadCount'),
   clearCell: document.getElementById('clearCell'),
-  exportBtn: document.getElementById('btnExport'),
   reportMeta: document.getElementById('reportMeta'),
   kpi: document.getElementById('kpiCards'),
 };
@@ -2735,12 +2715,15 @@ function init(rows) {
 }
 
 function populateFilters() {
-  // Terms: chronological ascending (oldest at top), non-standard at bottom
-  const allTerms = Array.from(new Set(RAW.map(r => r['Intended Term']))).filter(Boolean);
+  // Terms: chronological ascending (oldest at top), non-standard then blank
+  // at the very bottom. Include blank-term records via the sentinel so they
+  // are user-selectable; default-selection logic ignores them.
+  const allTerms = Array.from(new Set(RAW.map(r => r['Intended Term'])));
   allTerms.sort((a, b) => parseTerm(a).sortKey - parseTerm(b).sortKey);
   els.term.innerHTML = allTerms.map(t => {
     const p = parseTerm(t);
-    return `<option value="${escapeAttr(t)}">${p.label}</option>`;
+    const val = t === '' ? BLANK_TERM_VALUE : t;
+    return `<option value="${escapeAttr(val)}">${escapeHtml(p.label)}</option>`;
   }).join('');
 
   // Stages dropdown: only the 7 pipeline stages (5-ADMIT covers CONDITIONAL too)
@@ -2749,21 +2732,9 @@ function populateFilters() {
     return `<option value="${escapeAttr(s)}">${escapeHtml(label)}</option>`;
   }).join('');
 
-  // Lead-list column header filters (local to lead list, not the matrix).
-  // Stage: same 7 pipeline stages as the top-bar filter.
-  els.hfStage.innerHTML = '<option value="">All</option>' + STAGES.map(s => {
-    const label = s === '5-ADMIT' ? '5-ADMIT (incl. Conditional)' : s;
-    return `<option value="${escapeAttr(s)}">${escapeHtml(label)}</option>`;
-  }).join('');
-  // Term: every unique term value, chronological ascending with non-standard
-  // values at the bottom — matches the top-bar Term order.
-  els.hfTerm.innerHTML = '<option value="">All</option>' + allTerms.map(t => {
-    const p = parseTerm(t);
-    return `<option value="${escapeAttr(t)}">${escapeHtml(p.label)}</option>`;
-  }).join('');
-  // Major: alphabetical.
+  // Major dropdown for the top filter bar — alphabetical, "All" as default.
   const majors = Array.from(new Set(RAW.map(r => r['Intended Major']))).filter(Boolean).sort();
-  els.hfMajor.innerHTML = '<option value="">All</option>' + majors.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
+  els.major.innerHTML = '<option value="">All Majors</option>' + majors.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
 
   // Date range — set min/max
   const dates = RAW.map(r => parseUSDate(r['Created Date'])).filter(d => d).sort((a,b) => a - b);
@@ -2782,7 +2753,9 @@ function setDefaultTermFilter() {
   // current + next 3 (4 terms total): e.g. Summer 2026, Fall 2026, Spring 2027, Summer 2027
   const target = termsAround(center, 0, 3);
   Array.from(els.term.options).forEach(opt => {
-    const k = parseTerm(opt.value).sortKey;
+    const raw = opt.value === BLANK_TERM_VALUE ? '' : opt.value;
+    const k = parseTerm(raw).sortKey;
+    // target holds yyyymm integers; blank's sortKey is 1e9+1 so it never matches.
     opt.selected = target.includes(k);
   });
 }
@@ -2791,11 +2764,14 @@ function setDefaultTermFilter() {
 function getSelected(sel) { return Array.from(sel.selectedOptions).map(o => o.value); }
 
 function applyFilters() {
-  const terms = getSelected(els.term);
+  // Decode the blank-term sentinel back to '' so the equality check against
+  // r['Intended Term'] works without special-casing further down.
+  const terms = getSelected(els.term).map(t => t === BLANK_TERM_VALUE ? '' : t);
   const virtualStages = getSelected(els.stage);
   // Expand virtual stages (e.g. 5-ADMIT → 5-ADMIT + CONDITIONAL_5-ADMIT)
   const stageSet = new Set();
   virtualStages.forEach(v => (STAGE_INCLUDES[v] || [v]).forEach(s => stageSet.add(s)));
+  const major = els.major.value;
   const from = els.from.value ? new Date(els.from.value) : null;
   const to = els.to.value ? new Date(els.to.value) : null;
   if (to) to.setHours(23,59,59,999);
@@ -2809,6 +2785,7 @@ function applyFilters() {
     if (EXCLUDED_STAGES.includes(stage)) return false;
     if (terms.length && !terms.includes(r['Intended Term'])) return false;
     if (virtualStages.length && !stageSet.has(stage)) return false;
+    if (major && r['Intended Major'] !== major) return false;
     if (from || to) {
       const d = parseUSDate(r['Created Date']);
       if (!d) return false;
@@ -2884,17 +2861,20 @@ function renderKPIs(rows) {
 }
 
 function renderMatrix(rows) {
-  // Terms shown: whatever passes the term filter, chronological ascending
-  const termList = Array.from(new Set(rows.map(r => r['Intended Term']))).filter(Boolean);
+  // Terms shown: whatever passes the term filter, chronological ascending.
+  // Include '' so blank-term rows appear when the user selects them.
+  const termList = Array.from(new Set(rows.map(r => r['Intended Term'])));
   termList.sort((a, b) => parseTerm(a).sortKey - parseTerm(b).sortKey);
 
   // Columns: the 7 pipeline stages (5-ADMIT folds in CONDITIONAL_5-ADMIT).
   const cols = STAGES.slice();
 
-  // counts[term][virtualStage] — apply rollup so CONDITIONAL counts as 5-ADMIT
+  // counts[term][virtualStage] — apply rollup so CONDITIONAL counts as 5-ADMIT.
+  // Use the raw term value (incl. '') as the key so the termList iteration
+  // below lines up with the counts dict.
   const counts = {};
   for (const r of rows) {
-    const t = r['Intended Term'] || '(blank)';
+    const t = r['Intended Term'];
     const virt = ROLLUP_STAGE[r['Active Stage']];
     if (!virt) continue; // unknown / excluded stage
     if (!counts[t]) counts[t] = {};
@@ -2931,16 +2911,20 @@ function renderMatrix(rows) {
     const rowTotal = cols.reduce((a, c) => a + ((counts[t] && counts[t][c]) || 0), 0);
     if (!rowTotal) return;
     const label = parseTerm(t).label;
-    const rowActive = selectedCell && selectedCell.term === t && !selectedCell.stage ? 'row-active' : '';
+    // For blank-term rows we emit the sentinel in data-term so the cell click
+    // can distinguish "this blank-term row" from "the Total row" (which uses
+    // data-term="" to mean any term).
+    const termAttr = t === '' ? BLANK_TERM_VALUE : t;
+    const rowActive = selectedCell && selectedCell.term === termAttr && !selectedCell.stage ? 'row-active' : '';
     html += `<tr class="${rowActive}"><td>${escapeHtml(label)}</td>`;
     cols.forEach((c, i) => {
       const v = (counts[t] && counts[t][c]) || 0;
-      const isActive = selectedCell && selectedCell.term === t && selectedCell.stage === c;
+      const isActive = selectedCell && selectedCell.term === termAttr && selectedCell.stage === c;
       const cls = `cell col-s${i+1}${isActive ? ' active' : ''}`;
-      html += `<td class="${cls}" data-term="${escapeAttr(t)}" data-stage="${escapeAttr(c)}">${v || ''}</td>`;
+      html += `<td class="${cls}" data-term="${escapeAttr(termAttr)}" data-stage="${escapeAttr(c)}">${v || ''}</td>`;
     });
-    const totalActive = selectedCell && selectedCell.term === t && !selectedCell.stage;
-    html += `<td class="cell col-total${totalActive ? ' active' : ''}" data-term="${escapeAttr(t)}" data-stage="">${rowTotal}</td></tr>`;
+    const totalActive = selectedCell && selectedCell.term === termAttr && !selectedCell.stage;
+    html += `<td class="cell col-total${totalActive ? ' active' : ''}" data-term="${escapeAttr(termAttr)}" data-stage="">${rowTotal}</td></tr>`;
   });
 
   html += '</tbody>';
@@ -3042,24 +3026,18 @@ function renderLeads(filtered) {
   let rows = filtered;
   if (selectedCell) {
     const stageMatch = selectedCell.stage ? new Set(STAGE_INCLUDES[selectedCell.stage] || [selectedCell.stage]) : null;
+    // Decode the blank-term sentinel back to '' so the equality check works.
+    // selectedCell.term === '' still means "any term" (Total-row click) and
+    // shouldn't filter; selectedCell.term === BLANK_TERM_VALUE means "filter
+    // to records whose Intended Term is empty".
+    const wantTerm = selectedCell.term === BLANK_TERM_VALUE ? '' : selectedCell.term;
+    const termIsConstrained = !!selectedCell.term;  // truthy for any specific selection (sentinel is truthy)
     rows = rows.filter(r => {
-      if (selectedCell.term && r['Intended Term'] !== selectedCell.term) return false;
+      if (termIsConstrained && r['Intended Term'] !== wantTerm) return false;
       if (stageMatch && !stageMatch.has(r['Active Stage'])) return false;
       return true;
     });
   }
-  // Column-header dropdown filters narrow the lead list further (do NOT affect
-  // the matrix or KPI cards above). Stage uses STAGE_INCLUDES so picking
-  // 5-ADMIT also pulls in CONDITIONAL_5-ADMIT records.
-  const hfStageVal = els.hfStage.value;
-  const hfTermVal  = els.hfTerm.value;
-  const hfMajorVal = els.hfMajor.value;
-  if (hfStageVal) {
-    const stageMatch = new Set(STAGE_INCLUDES[hfStageVal] || [hfStageVal]);
-    rows = rows.filter(r => stageMatch.has(r['Active Stage']));
-  }
-  if (hfTermVal)  rows = rows.filter(r => r['Intended Term']  === hfTermVal);
-  if (hfMajorVal) rows = rows.filter(r => r['Intended Major'] === hfMajorVal);
   // Default sort: by Stage DESCENDING (7-Enroll first, then 6-Deposit, ..., 1-Suspect last).
   // CONDITIONAL_5-ADMIT slots alongside 5-ADMIT via STAGE_ORDER.
   // Within a stage, sort by Intended Term (chronological), then Created Date (newest first).
@@ -3120,24 +3098,15 @@ function escapeAttr(s) { return escapeHtml(s); }
 
 // ---------- EVENTS ----------
 ['change','input'].forEach(ev => {
-  ['fName','fTerm','fStage','fFrom','fTo'].forEach(id => {
+  ['fName','fTerm','fStage','fMajor','fFrom','fTo'].forEach(id => {
     document.getElementById(id).addEventListener(ev, () => { selectedCell = null; render(); });
   });
-});
-// Header-column dropdowns: changing one re-renders the lead list only. Don't
-// clear selectedCell here — the user may want to keep their matrix-cell drill
-// active and just narrow further with a header value.
-['hfStage','hfTerm','hfMajor'].forEach(id => {
-  document.getElementById(id).addEventListener('change', () => render());
 });
 els.reset.addEventListener('click', () => {
   els.name.value = '';
   setDefaultTermFilter();
   Array.from(els.stage.options).forEach(o => o.selected = false);
-  // Clear the column-header dropdowns too so Reset means a true clean slate.
-  els.hfStage.value = '';
-  els.hfTerm.value  = '';
-  els.hfMajor.value = '';
+  els.major.value = '';
   const dates = RAW.map(r => parseUSDate(r['Created Date'])).filter(Boolean).sort((a,b) => a-b);
   if (dates.length) {
     els.from.value = isoDate(dates[0]);
@@ -3147,41 +3116,6 @@ els.reset.addEventListener('click', () => {
   render();
 });
 els.clearCell.addEventListener('click', () => { selectedCell = null; render(); });
-els.file.addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const rows = parseCSV(ev.target.result);
-      if (!rows.length) { alert('No rows found in CSV.'); return; }
-      init(rows);
-    } catch (err) {
-      alert('Failed to parse CSV: ' + err.message);
-    }
-  };
-  reader.readAsText(f);
-});
-els.exportBtn.addEventListener('click', () => {
-  let rows = applyFilters();
-  if (selectedCell) {
-    rows = rows.filter(r => {
-      if (selectedCell.term && r['Intended Term'] !== selectedCell.term) return false;
-      if (selectedCell.stage && r['Active Stage'] !== selectedCell.stage) return false;
-      return true;
-    });
-  }
-  const cols = ['Created Date','Element ID','Last Name','First Name','Active Stage','Intended Term','Intended Major','Email','Last Form','Referred By','Last Activity','Last Event'];
-  const csv = [cols.join(',')].concat(rows.map(r => cols.map(c => {
-    const v = (r[c] || '').replace(/"/g, '""');
-    return /[",\n]/.test(v) ? `"${v}"` : v;
-  }).join(','))).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `admissions_leads_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-});
 
 // ---------- BOOTSTRAP ----------
 window.addEventListener('DOMContentLoaded', () => {
