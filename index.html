@@ -202,9 +202,21 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
       <input type="date" id="fTo">
     </label>
   </div>
-  <label class="fld">Search Name
-    <input type="text" id="fName" placeholder="First or last name…" autocomplete="off" spellcheck="false" style="min-width:180px">
-  </label>
+  <div class="fld-stack">
+    <label class="fld">View
+      <select id="fView" style="min-width:200px">
+        <option value="">All Leads</option>
+        <option value="upcoming">Next Term · sorted by Stage</option>
+        <option value="new_leads">New Leads · last 14 days</option>
+        <option value="new_apps_started">New Apps Started · last 14 days</option>
+        <option value="new_apps_submitted">New Apps Submitted · last 14 days</option>
+        <option value="new_deposits">New Deposits Paid · last 14 days</option>
+      </select>
+    </label>
+    <label class="fld">Search Name
+      <input type="text" id="fName" placeholder="First or last name…" autocomplete="off" spellcheck="false" style="min-width:180px">
+    </label>
+  </div>
   <label class="fld">Active Stage
     <select id="fStage" multiple size="3"></select>
   </label>
@@ -2476,7 +2488,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/15/2025,Malpe Surekha,Bhat,1-SUSPECT,,,surekha.bhat@ausoma.org,,,,emailDelivered,,,6917c387cb5287c6ed0d2314
 11/15/2025,Rafael,Seba,1-SUSPECT,,,rase0016@ausoma.org,,,,emailOpened,,,6917c387ccadf21b900fc304
 11/15/2025,Elesasheraine,Erasmus,1-SUSPECT,,,eler0019@ausoma.org,,,,emailOpened,,,6917c387ccadf21b900fc307
-11/15/2025,Ayat,Mnaather,2-PROSPECT,2,5 Year Pre-Med MD Program,aymn0020@ausoma.org,ausoma.forms.7888,,12/02/2025,smsDelivered,66ba570d99100a2a2a0b2f32,,6917c387ccadf21b900fc30a
+11/15/2025,Ayat,Mnaather,2-PROSPECT,September 2025,5 Year Pre-Med MD Program,aymn0020@ausoma.org,ausoma.forms.7888,,12/02/2025,smsDelivered,66ba570d99100a2a2a0b2f32,,6917c387ccadf21b900fc30a
 11/15/2025,Ziyad,Tariq,1-SUSPECT,,,zita0023@ausoma.org,,,,emailOpened,,,6917c387ccadf21b900fc310
 11/15/2025,Himani,Patel,1-SUSPECT,,,hipa0014@ausoma.org,,,,emailOpened,,,6917c388cb5287c6ed0d2317
 11/15/2025,Kimberly,Robinson,1-SUSPECT,,,kiro0028@ausoma.org,,,,emailDelivered,,,6917c389cb5287c6ed0d231a
@@ -2678,12 +2690,92 @@ const STAGE_ORDER = {}; STAGES.forEach((s, i) => STAGE_ORDER[s] = i);
 // For sorting, treat CONDITIONAL_5-ADMIT as same rank as 5-ADMIT
 STAGE_ORDER['CONDITIONAL_5-ADMIT'] = STAGE_ORDER['5-ADMIT'] + 0.5;
 
+// ---------- VIEWS (preset filter snapshots) ----------
+// A view supersedes the manual filters: when one is selected, the matrix,
+// KPI cards, conversion table, and lead list all use the view's row set.
+// EXCLUDED_STAGES (DEFERRED/WITHDRAW/DENIED) are stripped before the view
+// runs, same as the standard filter path, so views never include closed-out
+// leads.
+//
+// "New X in past 14 days" views use Last Activity as the proxy for when the
+// stage event happened — Element451 doesn't surface stage-transition
+// timestamps in this export, so this is the closest signal available.
+// New Leads uses Created Date (one-time, set on lead creation).
+const DAY_MS = 24 * 60 * 60 * 1000;
+function daysAgo(n) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return new Date(d.getTime() - n * DAY_MS);
+}
+function nextTermKey() {
+  const cur = currentTermKey();
+  const seq = [1, 5, 9];
+  const y = Math.floor(cur / 100), m = cur % 100;
+  const i = seq.indexOf(m);
+  if (i === 2) return (y + 1) * 100 + 1;
+  return y * 100 + seq[i + 1];
+}
+function termKeyToLabel(key) {
+  const y = Math.floor(key / 100), m = key % 100;
+  return `${NUM_TO_SEASON[m]} ${y}`;
+}
+
+// Recency check used by stage-based views: a record counts as "in the past N
+// days" if EITHER its Created Date OR its Last Activity is within the window.
+// This catches both fresh leads (Created Date recent) AND existing leads that
+// recently shifted into the target stage (Last Activity recent). The OR is
+// the best we can do without Element451 surfacing stage-transition timestamps.
+function recentlyTouched(r, cutoff) {
+  const dC = parseUSDate(r['Created Date']);
+  const dA = parseUSDate(r['Last Activity']);
+  return (dC && dC >= cutoff) || (dA && dA >= cutoff);
+}
+
+const VIEWS = {
+  upcoming: {
+    filter: (rows) => {
+      const key = nextTermKey();
+      return rows.filter(r => parseTerm(r['Intended Term']).sortKey === key);
+    }
+  },
+  new_leads: {
+    // "New" here unambiguously means newly-created lead records, so we use
+    // Created Date only (Last Activity isn't relevant for "is this a new lead").
+    filter: (rows) => {
+      const cutoff = daysAgo(14);
+      return rows.filter(r => {
+        const d = parseUSDate(r['Created Date']);
+        return d && d >= cutoff;
+      });
+    }
+  },
+  new_apps_started: {
+    filter: (rows) => {
+      const cutoff = daysAgo(14);
+      return rows.filter(r => r['Active Stage'] === '3-APPL_START' && recentlyTouched(r, cutoff));
+    }
+  },
+  new_apps_submitted: {
+    filter: (rows) => {
+      const cutoff = daysAgo(14);
+      return rows.filter(r => r['Active Stage'] === '4-APPL_SUBMIT' && recentlyTouched(r, cutoff));
+    }
+  },
+  new_deposits: {
+    filter: (rows) => {
+      const cutoff = daysAgo(14);
+      return rows.filter(r => r['Active Stage'] === '6-DEPOSIT' && recentlyTouched(r, cutoff));
+    }
+  }
+};
+
 // ---------- STATE ----------
 let RAW = [];          // all rows
 let donutChart = null;
 let selectedCell = null; // { term: 'May 2026', stage: '5-ADMIT' } or null
 
 const els = {
+  view: document.getElementById('fView'),
   name: document.getElementById('fName'),
   term: document.getElementById('fTerm'),
   stage: document.getElementById('fStage'),
@@ -2736,6 +2828,14 @@ function populateFilters() {
   const majors = Array.from(new Set(RAW.map(r => r['Intended Major']))).filter(Boolean).sort();
   els.major.innerHTML = '<option value="">All Majors</option>' + majors.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
 
+  // Inject the actual next-term name into the View dropdown's "upcoming" option
+  // so the user sees e.g. "Next Term: Fall 2026 · sorted by Stage" rather than
+  // a generic label.
+  const upcomingOpt = els.view.querySelector('option[value="upcoming"]');
+  if (upcomingOpt) {
+    upcomingOpt.textContent = `Next Term: ${termKeyToLabel(nextTermKey())} · sorted by Stage`;
+  }
+
   // Date range — set min/max
   const dates = RAW.map(r => parseUSDate(r['Created Date'])).filter(d => d).sort((a,b) => a - b);
   if (dates.length) {
@@ -2764,6 +2864,18 @@ function setDefaultTermFilter() {
 function getSelected(sel) { return Array.from(sel.selectedOptions).map(o => o.value); }
 
 function applyFilters() {
+  // Always strip closed-out stages first.
+  const pipeline = RAW.filter(r => !EXCLUDED_STAGES.includes(r['Active Stage']));
+
+  // Preset View supersedes the manual filters. When a view is active, the
+  // matrix / KPI cards / conversion table / lead list all run against the
+  // view-filtered set, ignoring whatever's in the date / search / dropdown
+  // inputs above.
+  const viewKey = els.view.value;
+  if (viewKey && VIEWS[viewKey]) {
+    return VIEWS[viewKey].filter(pipeline);
+  }
+
   // Decode the blank-term sentinel back to '' so the equality check against
   // r['Intended Term'] works without special-casing further down.
   const terms = getSelected(els.term).map(t => t === BLANK_TERM_VALUE ? '' : t);
@@ -3098,11 +3210,12 @@ function escapeAttr(s) { return escapeHtml(s); }
 
 // ---------- EVENTS ----------
 ['change','input'].forEach(ev => {
-  ['fName','fTerm','fStage','fMajor','fFrom','fTo'].forEach(id => {
+  ['fView','fName','fTerm','fStage','fMajor','fFrom','fTo'].forEach(id => {
     document.getElementById(id).addEventListener(ev, () => { selectedCell = null; render(); });
   });
 });
 els.reset.addEventListener('click', () => {
+  els.view.value = '';
   els.name.value = '';
   setDefaultTermFilter();
   Array.from(els.stage.options).forEach(o => o.selected = false);
