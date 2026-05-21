@@ -278,7 +278,7 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
      UTC ISO time the Element451 fetch ran. Stays "NOT_YET_SET" if a build
      somehow shipped without substitution; the dashboard falls back to page
      load time in that case. -->
-<script id="data-refreshed-at" type="application/json">"2026-05-21T10:43:42.606941+00:00"</script>
+<script id="data-refreshed-at" type="application/json">"2026-05-21T11:02:07.035255+00:00"</script>
 
 <!-- Bootstrap data: embedded Element451 export -->
 <script type="text/csv" id="bootstrap-csv">
@@ -2917,6 +2917,22 @@ function setDefaultTermFilter() {
 function getSelected(sel) { return Array.from(sel.selectedOptions).map(o => o.value); }
 
 function applyFilters() {
+  // Name search wins over everything else. When the search box has a value,
+  // we search the entire RAW dataset — including DEFERRED / WITHDRAW / DENIED
+  // and ignoring the active View and the other filters — so a "find this
+  // person no matter where they are in the pipeline" use case always works.
+  // Only when search returns truly zero matches does the lead list show
+  // "No leads match" — because at that point the person isn't in any list.
+  const nameQuery = (els.name.value || '').trim().toLowerCase();
+  if (nameQuery) {
+    return RAW.filter(r => {
+      const fn = (r['First Name'] || '').toLowerCase();
+      const ln = (r['Last Name']  || '').toLowerCase();
+      const combined = `${fn} ${ln}`;
+      return fn.includes(nameQuery) || ln.includes(nameQuery) || combined.includes(nameQuery);
+    });
+  }
+
   // Always strip closed-out stages first.
   const pipeline = RAW.filter(r => !EXCLUDED_STAGES.includes(r['Active Stage']));
 
@@ -2944,9 +2960,6 @@ function applyFilters() {
   const from = els.from.value ? new Date(els.from.value) : null;
   const to = els.to.value ? new Date(els.to.value) : null;
   if (to) to.setHours(23,59,59,999);
-  // Name search — case-insensitive substring against First + Last + combined.
-  // Whitespace-tolerant so "john smith" matches against "John" "Smith".
-  const nameQuery = (els.name.value || '').trim().toLowerCase();
 
   return RAW.filter(r => {
     const stage = r['Active Stage'];
@@ -2965,12 +2978,6 @@ function applyFilters() {
       if (!d) return false;
       if (from && d < from) return false;
       if (to && d > to) return false;
-    }
-    if (nameQuery) {
-      const fn = (r['First Name'] || '').toLowerCase();
-      const ln = (r['Last Name']  || '').toLowerCase();
-      const combined = `${fn} ${ln}`;
-      if (!fn.includes(nameQuery) && !ln.includes(nameQuery) && !combined.includes(nameQuery)) return false;
     }
     return true;
   });
