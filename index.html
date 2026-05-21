@@ -73,10 +73,10 @@ nav.tabs a.active { color:#0a3478; background:var(--accent); border-color:var(--
 .filters .fld-stack input[type=date] { min-width:130px; }
 .filters select:hover, .filters input:hover { border-color:var(--brand-2); }
 .filters select:focus, .filters input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(240,165,0,.25); }
-/* Reset button sits inline with the other .fld controls — no special
-   wrapper. align-items:flex-end on the parent .filters keeps it on the
-   same baseline as the inputs above their labels. */
-.filters .btn { align-self:flex-end; }
+/* Reset button now lives inside a fld-stack with Intended Major below it.
+   width:100% makes it fill the column slot so it visually anchors the top of
+   the stack the way the label/input pairs do in the other stacks. */
+.filters .fld-stack .btn { width:100%; padding:8px 12px; }
 .btn { font:12px inherit; padding:6px 12px; border:1.5px solid var(--brand); border-radius:6px; background:#fff; color:var(--brand); cursor:pointer; font-weight:600; }
 .btn:hover { background:var(--brand); color:#fff; }
 
@@ -206,7 +206,7 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
     <label class="fld">View
       <select id="fView" style="min-width:200px">
         <option value="">All Leads</option>
-        <option value="upcoming">Next Term · sorted by Stage</option>
+        <option value="upcoming">Next Term · by Stage</option>
         <option value="new_leads">New Leads · last 14 days</option>
         <option value="new_apps_started">New Apps Started · last 14 days</option>
         <option value="new_apps_submitted">New Apps Submitted · last 14 days</option>
@@ -223,10 +223,12 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
   <label class="fld">Intended Term
     <select id="fTerm" multiple size="3"></select>
   </label>
-  <label class="fld">Intended Major
-    <select id="fMajor"></select>
-  </label>
-  <button class="btn" id="btnReset">Reset filters</button>
+  <div class="fld-stack">
+    <button class="btn" id="btnReset">Reset filters</button>
+    <label class="fld">Intended Major
+      <select id="fMajor"></select>
+    </label>
+  </div>
 </section>
 
 <section class="leads-section">
@@ -2228,7 +2230,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 01/27/2025,Siyamak,Idrissi,2-PROSPECT,May 2025,4 Year MD Program,makidrissi@yahoo.com,ausoma.forms.8763,,02/24/2025,emailOpened,66ba570d99100a2a2a0b2f32,,6797a0af82c1f291ef023af6
 01/29/2025,Marcia,Lewis,APPLICATION_START,May 2025,4 Year MD Program,marjen1710@gmail.com,,,04/01/2025,emailOpened,66ba570d99100a2a2a0b2f32,"Transfer Student,App Submitted: Waiting on documents",6799bde49632d82216039d02
 01/30/2025,Tia,Falls,APPLICATION_START,September 2025,5 Year Pre-Med MD Program,fallstia14@gmail.com,,,12/02/2025,emailDelivered,67b22dd51150f0f84a04633e,Unresponsive,679b2558d380917648044e61
-02/03/2025,Anthony C.l,Aldama,6-DEPOSIT,May 2026,4 Year MD Program,aldamatony@gmail.com,ausoma.forms.7359,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"App Submitted: Waiting on documents,Conditional Admission,Deferral #1",67a11e2de42f354f820ae555
+02/03/2025,Anthony C.l,Aldama,6-DEPOSIT,September 2026,4 Year MD Program,aldamatony@gmail.com,ausoma.forms.7359,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"App Submitted: Waiting on documents,Conditional Admission,Deferral #1",67a11e2de42f354f820ae555
 02/04/2025,Ridhi,Verma,2-PROSPECT,September 2025,5 Year Pre-Med MD Program,rverma@iletter.org,ausoma.forms.7116,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Historic Data (HubSpot),67a1759bd6d5ffce3d0f8991
 02/05/2025,DJAFAR,ASIA,2-PROSPECT,May 2025,5 Year Pre-Med MD Program,dasia2@illinois.edu,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"App Submitted: Interview Stage,Unresponsive",67a3adf6c95e2d028a06bf05
 02/07/2025,Brianna,Oppong-Antwi,2-PROSPECT,May 2025,,briannaoppong@gmail.com,ausoma.forms.7116,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,67a66fdf7ee114e3d90ca615
@@ -2570,7 +2572,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 05/14/2026,MAHI,DAVE,2-PROSPECT,,,bhaskardave27@gmail.com,,,,userCreated,,,6a0602c06b3382fcfe0e8e9c
 05/14/2026,Dipak,Jani,1-SUSPECT,,,janiusa3695@gmail.com,,,,emailOpened,,,6a0602c16da13337f90b2307
 05/17/2026,Latez,Nelson,APPLICATION_START,,,teznelsonclb3@gmail.com,,,,userLogin,,,6a092dc4c3a4aa74c300f8b7
-05/21/2026,Maria,Baguioro,2-PROSPECT,2026 and Beyond,4 Year MD Program,mariakatrinabaguioro@gmail.com,,,,userCreated,,,6a0e69103117707fe007cb45
+05/21/2026,Maria,Baguioro,2-PROSPECT,2026 and Beyond,4 Year MD Program,mariakatrinabaguioro@gmail.com,,,,emailOpened,,,6a0e69103117707fe007cb45
 </script>
 
 <script>
@@ -2829,11 +2831,11 @@ function populateFilters() {
   els.major.innerHTML = '<option value="">All Majors</option>' + majors.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
 
   // Inject the actual next-term name into the View dropdown's "upcoming" option
-  // so the user sees e.g. "Next Term: Fall 2026 · sorted by Stage" rather than
-  // a generic label.
+  // so the user sees e.g. "Next Term: Fall 2026 · by Stage" rather than a
+  // generic label.
   const upcomingOpt = els.view.querySelector('option[value="upcoming"]');
   if (upcomingOpt) {
-    upcomingOpt.textContent = `Next Term: ${termKeyToLabel(nextTermKey())} · sorted by Stage`;
+    upcomingOpt.textContent = `Next Term: ${termKeyToLabel(nextTermKey())} · by Stage`;
   }
 
   // Date range — set min/max
