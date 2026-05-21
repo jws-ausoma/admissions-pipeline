@@ -65,6 +65,12 @@ nav.tabs a.active { color:#0a3478; background:var(--accent); border-color:var(--
   transition:border-color .15s, box-shadow .15s; min-width:140px;
 }
 .filters select[multiple] { min-height:90px; min-width:160px; }
+/* Stack From/To dates vertically into one column slot. Two single-row .fld
+   children → ~2× the label+input height of a normal filter, which roughly
+   matches the multi-select heights to their right so the row feels balanced. */
+.filters .fld-stack { display:flex; flex-direction:column; gap:4px; }
+.filters .fld-stack .fld { margin:0; }
+.filters .fld-stack input[type=date] { min-width:130px; }
 .filters select:hover, .filters input:hover { border-color:var(--brand-2); }
 .filters select:focus, .filters input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(240,165,0,.25); }
 /* Reset button sits inline with the other .fld controls — no special
@@ -188,12 +194,14 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
 </section>
 
 <section class="filters">
-  <label class="fld">Created From
-    <input type="date" id="fFrom">
-  </label>
-  <label class="fld">Created To
-    <input type="date" id="fTo">
-  </label>
+  <div class="fld-stack">
+    <label class="fld">Created From
+      <input type="date" id="fFrom">
+    </label>
+    <label class="fld">Created To
+      <input type="date" id="fTo">
+    </label>
+  </div>
   <label class="fld">Search Name
     <input type="text" id="fName" placeholder="First or last name…" autocomplete="off" spellcheck="false" style="min-width:180px">
   </label>
@@ -1363,7 +1371,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 10/02/2024,Gifty,Amponsah,1-SUSPECT,May 2024,4 Year MD Program,giftyabenaamponsah1@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd631724927ecd5c066110
 10/02/2024,RUDOLPH,FERNANDEZ,1-SUSPECT,January 2025,5 Year Pre-Med MD Program,rudyfernandez82@hotmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd63172ffd5514a4060848
 10/02/2024,Traci,Sisson,1-SUSPECT,January 2025,5 Year Pre-Med MD Program,tracisisson@yahoo.com,,,,emailClicked,,Historic Data (HubSpot),66fd63172ffd5514a406084b
-10/02/2024,Ayat,Mnaather,2-PROSPECT,2,5 Year Pre-Med MD Program,ayat.safaa69@gmail.com,ausoma.forms.7359,,,emailDelivered,,Historic Data (HubSpot),66fd63172ffd5514a406084e
+10/02/2024,Ayat,Mnaather,7-ENROLL,September 2025,5 Year Pre-Med MD Program,ayatsafaa69@gmail.com,ausoma.forms.7888,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"Historic Data (HubSpot),Unresponsive,Conditional Admission",66fd63172ffd5514a406084e
 10/02/2024,Jonathan,Eostein,1-SUSPECT,January 2025,5 Year Pre-Med MD Program,jonathanepstein1000@icloud.com,,,,emailDelivered,,Historic Data (HubSpot),66fd63172ffd5514a4060851
 10/02/2024,Tatiane,Espada,1-SUSPECT,January 2025,5 Year Pre-Med MD Program,tespadart@gmail.com,,,,emailOpened,,Historic Data (HubSpot),66fd63172ffd5514a4060854
 10/02/2024,Alicia,Kasten,1-SUSPECT,January 2025,5 Year Pre-Med MD Program,aliciakasten6@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd63172ffd5514a4060857
@@ -1594,7 +1602,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 10/02/2024,Ataya,Horn,1-SUSPECT,January 2025,4 Year MD Program,akhorn16@gmail.com,,,10/29/2024,emailDelivered,67b22dd51150f0f84a04633e,Historic Data (HubSpot),66fd631c08e079b3730fa393
 10/02/2024,Sara,DeWitt,1-SUSPECT,January 2025,5 Year Pre-Med MD Program,logicalwoman@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd631c1c952c7b6906f9ea
 10/02/2024,Omar Alfarooq,Al gburi,APPLICATION_START,January 2025,5 Year Pre-Med MD Program,omaralfarooq64@gmail.com,,,12/09/2024,emailDelivered,67b22dd51150f0f84a04633e,Historic Data (HubSpot),66fd631c1c952c7b6906f9ed
-10/02/2024,Kirlew,Matthie,1-SUSPECT,May 2024,4 Year MD Program,kirlew.matthie@fortbendisd.com,,,,emailDelivered,,Historic Data (HubSpot),66fd631c24927ecd5c06615b
+10/02/2024,Kirlew,Matthie,2-PROSPECT,September 2025,4 Year MD Program,mdoctork@gmail.com,,,08/20/2025,pageview,,"Historic Data (HubSpot),Unresponsive",66fd631c24927ecd5c06615b
 10/02/2024,Karissa,Johnson,1-SUSPECT,May 2024,4 Year MD Program,kjohnsonrn89@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd631c24927ecd5c06615e
 10/02/2024,Michele,Schuffert,1-SUSPECT,May 2024,4 Year MD Program,cheleby14@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd631c24927ecd5c066161
 10/02/2024,Jamal,Khan,1-SUSPECT,May 2024,4 Year MD Program,jamalkhanmd@gmail.com,,,,emailOpened,,Historic Data (HubSpot),66fd631c24927ecd5c066164
@@ -2113,7 +2121,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 12/04/2024,Sarah,Merriman,7-ENROLL,May 2021,,sacr0011@ausoma.org,,,,emailOpened,,,675085ff10cb6f2dfb0fad2f
 12/04/2024,Azad,Farr,7-ENROLL,May 2021,4 Year MD Program,azfa0008@ausoma.org,,,,emailDelivered,,,675085ff10cb6f2dfb0fad32
 12/04/2024,Morgan,Matese,7-ENROLL,May 2021,,moma0012@ausoma.org,,,,emailOpened,,,675085ff10cb6f2dfb0fad35
-12/04/2024,Mario,Carrasco,7-ENROLL,September 2021,,maca0019@ausoma.org,,,,emailOpened,,,675085ff10cb6f2dfb0fad38
+12/04/2024,Mario,Carrasco,2-PROSPECT,September 2021,,mariocarrascox@gmaail.com,,,,smsClicked,,,675085ff10cb6f2dfb0fad38
 12/04/2024,Marina,Flores,7-ENROLL,September 2021,,mafl0025@ausoma.org,,,,emailOpened,,,675085ff10cb6f2dfb0fad3b
 12/04/2024,Juanita,Wheeler,7-ENROLL,September 2021,,juwh0027@ausoma.org,,,11/03/2025,smsInboundReceived,,,675085ff10cb6f2dfb0fad3e
 12/04/2024,Ghassan,Jibawi,7-ENROLL,September 2021,,jigh0028@ausoma.org,,,,emailOpened,,,675085ff10cb6f2dfb0fad41
@@ -2195,7 +2203,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 01/13/2025,Lizbeth,Mata,2-PROSPECT,May 2025,Clinical Medicine Program (CMP),grupolarimar@gmail.com,ausoma.forms.7116,,01/27/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,678485a18ba96046e40f53b9
 01/13/2025,Gina,DeLaRosa,2-PROSPECT,May 2025,4 Year MD Program,ginadelarosa16@yahoo.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"Transfer Student,Unresponsive",67855077d7fbcd927f05dd6a
 01/14/2025,Noah,Weiss,APPLICATION_START,September 2025,5 Year Pre-Med MD Program,njw013@bucknell.edu,,,08/20/2025,emailDelivered,67b22dd51150f0f84a04633e,Unresponsive,6785cb0409121e83c506ce71
-01/14/2025,Lawrence,Chang,7-ENROLL,September 2025,4 Year MD Program,lhtchang@gmail.com,ausoma.forms.7888,,08/20/2025,emailDelivered,67b22dd51150f0f84a04633e,"International Student,App Submitted: Interview Stage,Admitted",6785f519030249cc6f038944
+01/14/2025,Lawrence,Chang,7-ENROLL,September 2025,4 Year MD Program,lhtchang@gmail.com,ausoma.forms.7888,,08/20/2025,emailOpened,67b22dd51150f0f84a04633e,"International Student,App Submitted: Interview Stage,Admitted",6785f519030249cc6f038944
 01/15/2025,Chelsi,Crawford,2-PROSPECT,2026 and Beyond,4 Year MD Program,cdcrawford999@gmail.com,ausoma.forms.7116,,01/15/2025,emailDelivered,67b22dd51150f0f84a04633e,,6787d48a00d2f4d81704162f
 01/15/2025,Korey,Mitchell,2-PROSPECT,May 2025,4 Year MD Program,kfamu@yahoo.com,ausoma.forms.7172,,01/29/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,6788439bf6458940a707eb67
 01/17/2025,Jasmine,Roloff,APPLICATION_START,May 2025,4 Year MD Program,jazjoon@yahoo.com,,,04/04/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6789d071d19046f7970bbf04
@@ -2272,7 +2280,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 03/31/2025,Dr. Ryan,Huffman,2-PROSPECT,September 2025,4 Year MD Program,rwhuffman@gmail.com,ausoma.forms.7116,,04/14/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,67e9f37de9b8d4b6f403bd3b
 04/01/2025,Naa Adoley,Allotey,APPLICATION_START,January 2026,4 Year MD Program,alloteynaaadoley0@gmail.com,ausoma.forms.7172,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,67ec09b35377bed5f206b5aa
 04/02/2025,Elesasheraine Micheala,Erasmus,6-DEPOSIT,September 2025,5 Year Pre-Med MD Program,elesasheraine00@gmail.com,ausoma.forms.7359,,07/22/2025,emailOpened,66ba570d99100a2a2a0b2f32,"Unresponsive,Admitted",67ecb4414bad37c6e301192f
-04/02/2025,Julia,George,CONDITIONAL_5-ADMIT,May 2025,4 Year MD Program,juliageorge2805@gmail.com,ausoma.forms.7359,,04/21/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Conditional Admission,67ed79f7bd9cfffe95076546
+04/02/2025,Julia,George,CONDITIONAL_5-ADMIT,May 2025,4 Year MD Program,juliageorge2805@gmail.com,ausoma.forms.7359,,04/21/2025,emailOpened,66ba570d99100a2a2a0b2f32,Conditional Admission,67ed79f7bd9cfffe95076546
 04/03/2025,Misty,Patel,2-PROSPECT,January 2026,4 Year MD Program,mistypatel1998@gmail.com,ausoma.forms.7116,,04/17/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,67ef0837ae2c8680330b4577
 04/06/2025,Megan,Dixon,2-PROSPECT,September 2025,4 Year MD Program,megandixon322@gmail.com,ausoma.forms.7172,,05/20/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,67f2fd2d3f197a9218005e84
 04/07/2025,Dion,Muhammad,2-PROSPECT,September 2025,5 Year Pre-Med MD Program,dion.muhammad@omnihotels.com,ausoma.forms.7116,None,04/16/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,67f410fe1c3bdf65410dda39
@@ -2298,7 +2306,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 04/23/2025,wef,wgr,2-PROSPECT,January 2026,Clinical Medicine Program (CMP),grammy2addy@col.com,ausoma.forms.7116,,04/25/2025,smsUnsubscribed,66ba570d99100a2a2a0b2f32,unqualified lead,68086bacfe4ff58e96028993
 04/23/2025,Anjaneya,Penneru,2-PROSPECT,May 2025,Clinical Medicine Program (CMP),synergizeusa@gmail.com,,,04/28/2025,emailOpened,,unqualified lead,680931f70a6ad9870a0f604a
 04/23/2025,Sai,Medha,WITHDRAW,September 2025,Clinical Medicine Program (CMP),smpenneru@gmail.com,ausoma.forms.7359,,08/20/2025,emailOpened,,"App Submitted: Interview Stage,Admitted,Withdrawn",680947808ec80129380a6735
-04/23/2025,Syed,Sharaf,6-DEPOSIT,May 2025,4 Year MD Program,sharafs00431@gmail.com,ausoma.forms.7359,,05/01/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"Applicant,App Submitted: Interview Stage,Admitted",6809689e137b01bf310da37e
+04/23/2025,Syed,Sharaf,6-DEPOSIT,May 2025,4 Year MD Program,sharafs00431@gmail.com,ausoma.forms.7359,,05/01/2025,emailOpened,66ba570d99100a2a2a0b2f32,"Applicant,App Submitted: Interview Stage,Admitted",6809689e137b01bf310da37e
 04/24/2025,Emi,Fedelesh,2-PROSPECT,September 2025,4 Year MD Program,emilyfed07@gmail.com,ausoma.forms.7116,dfdgdfg,05/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,unqualified lead,6809ce5c1adddde8060b4778
 04/25/2025,eric,tolar,2-PROSPECT,September 2025,Clinical Medicine Program (CMP),ericwtolar@gmail.com,ausoma.forms.7116,us,05/19/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,680b1f2ef70780127d07b3a0
 04/26/2025,Terry,Knight,2-PROSPECT,September 2025,5 Year Pre-Med MD Program,knightstar07@icloud.com,ausoma.forms.7116,erfeter,05/07/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,680c2a4fe29ab89b290b77d0
@@ -2382,9 +2390,8 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 06/13/2025,Hannah,Frazier,DENIED,September 2025,Clinical Medicine Program (CMP),hannah.frazier@hotmail.com,ausoma.forms.7359,,10/08/2025,emailDelivered,,Conditional Admission,684b933251d003b6c80ef258
 06/14/2025,Neil,Shah,WITHDRAW,January 2026,5 Year Pre-Med MD Program,neilnatavarlalshah@gmail.com,,,08/20/2025,emailDelivered,66ba570d99100a2a2a0b2f32,App Submitted: Interview Stage,684d7f1ebf9297cb780801a8
 06/16/2025,Michel,Buron,CONDITIONAL_5-ADMIT,January 2026,4 Year MD Program,buronm17@mytru.ca,ausoma.forms.7359,,08/20/2025,emailOpened,66ba570d99100a2a2a0b2f32,"App Submitted: Interview Stage,Conditional Admission",68501c841d791ff3a70460e5
-06/17/2025,Ved,Patel,5-ADMIT,January 2026,4 Year MD Program,vedpatel1601@gmail.com,,Abrar Khan,11/19/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"App Submitted: Interview Stage,Conditional Admission",68519550114faf3edf03c957
+06/17/2025,Ved,Patel,5-ADMIT,January 2026,4 Year MD Program,vedpatel1601@gmail.com,,Abrar Khan,11/19/2025,emailOpened,66ba570d99100a2a2a0b2f32,"App Submitted: Interview Stage,Conditional Admission",68519550114faf3edf03c957
 06/22/2025,Mannudeep,Kalra,2-PROSPECT,September 2026,5 Year Pre-Med MD Program,mkalra@mgh.harvard.edu,ausoma.forms.7116,,08/20/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,6858839dd6e9fa846c013ede
-06/24/2025,Ayat,Mnaather,7-ENROLL,September 2025,5 Year Pre-Med MD Program,ayatsafaa69@gmail.com,ausoma.forms.7888,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"Unresponsive,Conditional Admission",685a0c509f689c1b8a0bf768
 06/26/2025,raj,vbjj,APPLICATION_START,September 2025,,rvghaj@gmail.com,,,07/15/2025,userCreated,,unqualified lead,685c94f521414fa9a9005c69
 06/28/2025,Paula,Greene Candino,APPLICATION_START,September 2025,,greene.paula@ymail.com,,,08/20/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,685f55ba35606fb2e60cd434
 07/01/2025,diana,Dorado,2-PROSPECT,2026 and Beyond,5 Year Pre-Med MD Program,doradodianas@gmail.com,ausoma.forms.7116,no,07/07/2025,emailOpened,66ba570d99100a2a2a0b2f32,unqualified lead,6863fdc620709fa2f7050409
@@ -2402,7 +2409,6 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 07/19/2025,Mark,Ryder,2-PROSPECT,September 2025,,md2333@aol.com,,,08/20/2025,emailDelivered,,Unresponsive,687c25e7465e1f05230874e1
 07/21/2025,Paria,Ghassemi,APPLICATION_SUBMIT,January 2026,4 Year MD Program,drpariaghassemii@gmail.com,ausoma.forms.7359,,09/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,687e43b0ae1f1fbee8019038
 07/21/2025,Daniela,Oduber,APPLICATION_START,September 2025,,danielaoduber2212@gmail.com,,,07/22/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,687ea3cc826f756b990a9ad5
-07/24/2025,Kirlew,Matthie,2-PROSPECT,September 2025,,mdoctork@gmail.com,,,08/20/2025,pageview,,Unresponsive,6881f7a7b7c477cacc02f87b
 07/29/2025,Ansh,Narang,2-PROSPECT,September 2025,5 Year Pre-Med MD Program,vinkyn12@gmail.com,,,08/05/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68890fe036231943b402aee5
 08/05/2025,h,j,APPLICATION_SUBMIT,,,iandan8806@gmail.com,,,,emailDelivered,66ba570d99100a2a2a0b2f32,,689207ce71c070713e014eb0
 08/06/2025,Keely,Darichuk,2-PROSPECT,September 2025,,keelydarichuk@gmail.com,,,,emailOpened,,,6892a8bdb20bee32d90643b3
@@ -2423,7 +2429,6 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 08/28/2025,Bom,Bong,APPLICATION_START,,,bom_b.o.n.g@hotmail.com,,,10/15/2025,emailUnsubscribed,66ba570d99100a2a2a0b2f32,Unresponsive,68afafe00083794a3702e8d1
 08/28/2025,Rylee,Erickson,APPLICATION_START,,,ryleee1000@gmail.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68b0c94684c830bd9b05b5df
 08/30/2025,aiza,asim,APPLICATION_START,,,aizaasim98@gmail.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"International Student,Unresponsive",68b30c7740fe2adf8003a0af
-09/02/2025,Mario,Carrasco,2-PROSPECT,,,mariocarrascox@gmaail.com,,,,smsClicked,,,68b7450345846b05500a2336
 09/10/2025,Wildalis,Cossi,APPLICATION_START,,,cossiwildalis@gmail.com,,,09/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c1bd43c91e533aa205865c
 09/11/2025,Olivia,Di Serio,APPLICATION_START,September 2026,,olivia.diserio@icloud.com,,,12/01/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c2f1d8b8f271e1dd007626
 09/14/2025,Syed,Ghaus,APPLICATION_START,May 2026,,waleedghaus19@gmail.com,,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68c74326d8e67417d70b61aa
@@ -2462,7 +2467,6 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/12/2025,Krystal,Bergher,2-PROSPECT,January 2026,4 Year MD Program,krystel_bergher@yahoo.com,ausoma.forms.7116,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,,6914b9552efe91b6e10f972e
 11/13/2025,Devon,Winborne,2-PROSPECT,January 2025,4 Year MD Program,devon.winborne@me.com,,,12/02/2025,emailDelivered,,,69166b11e721434eb6091c20
 11/14/2025,Maria del mar,Matos,APPLICATION_START,,,m.delmar5401@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,691709854a03b6cfba074a94
-11/15/2025,Ved,Patel,1-SUSPECT,,,vepa0017@ausoma.org,,,,emailOpened,,,6917c386cb5287c6ed0d22ff
 11/15/2025,Andrea,Manson,1-SUSPECT,,,anma0024@ausoma.org,,,,emailDelivered,,,6917c386cb5287c6ed0d2302
 11/15/2025,Khaled,Badr,1-SUSPECT,,,khaled.badr@ausoma.org,,,,emailDelivered,,,6917c387cb5287c6ed0d2305
 11/15/2025,Priscilla,Pede,1-SUSPECT,,,pede.priscilla@ausoma.org,,,,emailDelivered,,,6917c387cb5287c6ed0d2308
@@ -2473,7 +2477,6 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/15/2025,Rafael,Seba,1-SUSPECT,,,rase0016@ausoma.org,,,,emailOpened,,,6917c387ccadf21b900fc304
 11/15/2025,Elesasheraine,Erasmus,1-SUSPECT,,,eler0019@ausoma.org,,,,emailOpened,,,6917c387ccadf21b900fc307
 11/15/2025,Ayat,Mnaather,2-PROSPECT,2,5 Year Pre-Med MD Program,aymn0020@ausoma.org,ausoma.forms.7888,,12/02/2025,smsDelivered,66ba570d99100a2a2a0b2f32,,6917c387ccadf21b900fc30a
-11/15/2025,Philip,Aka,1-SUSPECT,,,paka0021@ausoma.org,,,,emailDelivered,,,6917c387ccadf21b900fc30d
 11/15/2025,Ziyad,Tariq,1-SUSPECT,,,zita0023@ausoma.org,,,,emailOpened,,,6917c387ccadf21b900fc310
 11/15/2025,Himani,Patel,1-SUSPECT,,,hipa0014@ausoma.org,,,,emailOpened,,,6917c388cb5287c6ed0d2317
 11/15/2025,Kimberly,Robinson,1-SUSPECT,,,kiro0028@ausoma.org,,,,emailDelivered,,,6917c389cb5287c6ed0d231a
@@ -2486,10 +2489,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/15/2025,Tapish,Patel,1-SUSPECT,,,tapa0009@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d232f
 11/15/2025,Nnenna,Nnaji,1-SUSPECT,,,ainn0011@ausoma.org,,,,emailDelivered,,,6917c38acb5287c6ed0d2332
 11/15/2025,Syed Hamna,Moin,1-SUSPECT,,,syha0012@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d2335
-11/15/2025,Syed,Sharaf,1-SUSPECT,,,sysh0013@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d2338
-11/15/2025,Julia,George,1-SUSPECT,,,juge0014@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d233b
 11/15/2025,Anthony,Aldama,1-SUSPECT,,,alda0005@ausoma.org,,,,emailDelivered,,,6917c38acb5287c6ed0d233e
-11/15/2025,Lawrence,Chang,1-SUSPECT,,,latc0015@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d2341
 11/15/2025,Hamza,Begh,APPLICATION_START,,,messybb@outlook.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6917eeeeae41beaf22075923
 11/19/2025,Blaise,Vanderploeg,2-PROSPECT,May 2026,4 Year MD Program,blaisevdp@yahoo.com,ausoma.forms.7116,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,691e40eef1a79e331f0fac85
 11/21/2025,Osaheni,Amadasu,2-PROSPECT,,,osaheniamadasu@yahoo.com,,,,smsDelivered,,,6920b62a8b6738008b087d94
@@ -2549,7 +2549,6 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 04/18/2026,Anna,Burchette,APPLICATION_START,,,annaburchette@icloud.com,,,,emailDelivered,,,69e3dbf8ad09c3785e0483ff
 04/20/2026,noura,ghattas,APPLICATION_SUBMIT,,,nouraghattas16@gmail.com,,,,userLogin,,,69e6b84d67b49ad926045d61
 04/21/2026,Deborah,Adeyemo,APPLICATION_START,,,deborahadeyemo23@gmail.com,,,,userLogin,,,69e7740390dc5cf4a7046e36
-04/22/2026,Maya,Ferrer,1-SUSPECT,,,,,,,userCreated,,,69e8203e151413b85203eb14
 04/22/2026,Jeff,Agyei,1-SUSPECT,,,jeop0026@ausoma.org,,,,userCreated,,,69e8203f151413b85203eb17
 04/24/2026,Dr. Judith,Williams,2-PROSPECT,2026 and Beyond,4 Year MD Program,0621judyw@gmail.com,ausoma.forms.7116,N/A,,emailOpened,66ba570d99100a2a2a0b2f32,,69eab4693940f110d904ab75
 04/24/2026,Asad,Ali,2-PROSPECT,2026 and Beyond,4 Year MD Program,asad9272@gmail.com,ausoma.forms.7116,,,emailDelivered,66ba570d99100a2a2a0b2f32,,69eaf9ab540fa0cce10a11a4
@@ -2559,6 +2558,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 05/14/2026,MAHI,DAVE,2-PROSPECT,,,bhaskardave27@gmail.com,,,,userCreated,,,6a0602c06b3382fcfe0e8e9c
 05/14/2026,Dipak,Jani,1-SUSPECT,,,janiusa3695@gmail.com,,,,emailOpened,,,6a0602c16da13337f90b2307
 05/17/2026,Latez,Nelson,APPLICATION_START,,,teznelsonclb3@gmail.com,,,,userLogin,,,6a092dc4c3a4aa74c300f8b7
+05/21/2026,Maria,Baguioro,2-PROSPECT,2026 and Beyond,4 Year MD Program,mariakatrinabaguioro@gmail.com,,,,userCreated,,,6a0e69103117707fe007cb45
 </script>
 
 <script>
