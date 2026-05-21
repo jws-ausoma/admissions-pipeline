@@ -274,6 +274,12 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
 
 <footer class="confidential-footer">Proprietary and Confidential &middot; AUSOMA Internal Use Only</footer>
 
+<!-- Last-refresh timestamp — the build script overwrites the content with the
+     UTC ISO time the Element451 fetch ran. Stays "NOT_YET_SET" if a build
+     somehow shipped without substitution; the dashboard falls back to page
+     load time in that case. -->
+<script id="data-refreshed-at" type="application/json">"2026-05-21T10:43:42.606941+00:00"</script>
+
 <!-- Bootstrap data: embedded Element451 export -->
 <script type="text/csv" id="bootstrap-csv">
 Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Email,Last Form,Referred By,Last Activity,Last Event,Assignee,Label,Element ID
@@ -2619,8 +2625,12 @@ const NUM_TO_SEASON = { 1: 'Spring', 5: 'Summer', 9: 'Fall' };
 const BLANK_TERM_VALUE = '__BLANK__';
 
 function parseTerm(t) {
-  // returns { sortKey: yyyymm or Infinity, label: 'Summer 2026' or original, isStandard: bool }
-  if (!t) return { sortKey: 1e9 + 1, label: '(blank)', isStandard: false };
+  // Three kinds:
+  //   'standard' — "January YYYY" / "May YYYY" / "September YYYY"   → Spring/Summer/Fall YYYY
+  //   'beyond'   — "YYYY and Beyond"                                 → preserved as its own bucket
+  //   'blank'    — empty string, or anything else (junk values like "1", "2", "3"…)
+  // sortKey order: standard < beyond < blank.
+  if (!t) return { sortKey: 1e9, label: '(blank/undefined)', kind: 'blank' };
   const m = t.match(/^(January|May|September)\s+(\d{4})$/);
   if (m) {
     const month = MONTH_TO_NUM[m[1]];
@@ -2628,11 +2638,33 @@ function parseTerm(t) {
     return {
       sortKey: year * 100 + month,
       label: `${NUM_TO_SEASON[month]} ${year}`,
-      isStandard: true,
+      kind: 'standard',
       year, month
     };
   }
-  return { sortKey: 1e9, label: t, isStandard: false };
+  const beyond = t.match(/^(\d{4})\s+and\s+Beyond$/i);
+  if (beyond) {
+    const year = parseInt(beyond[1]);
+    return {
+      // Sort just after that year's three standard terms (Sep is *09, so 12
+      // pushes "Beyond" below it).
+      sortKey: year * 100 + 12,
+      label: `${year} and Beyond`,
+      kind: 'beyond',
+      year
+    };
+  }
+  // Junk values ("1", "2", "3", and anything else) collapse into the blank
+  // bucket so they don't pollute the term filter with one-off options.
+  return { sortKey: 1e9, label: '(blank/undefined)', kind: 'blank' };
+}
+
+// Maps any raw term value to the dropdown-option value that represents its
+// group. Standard and Beyond keep their raw string; blank-kind values all
+// collapse to BLANK_TERM_VALUE so the dropdown shows a single option for
+// them and the matrix shows a single grouped row.
+function termGroupKey(t) {
+  return parseTerm(t).kind === 'blank' ? BLANK_TERM_VALUE : t;
 }
 
 function currentTermKey(today = new Date()) {
@@ -2794,11 +2826,21 @@ const els = {
   kpi: document.getElementById('kpiCards'),
 };
 
-// Stage labels for KPI cards (Power BI codes → human-friendly)
+// Human-friendly display labels — used for KPI cards, stage filter dropdown,
+// matrix column headers, and lead-list pills. Internal stage IDs (1-SUSPECT,
+// etc.) stay the same so sort order and STAGE_INCLUDES/ROLLUP_STAGE keep
+// working; only the displayed text changes.
 const STAGE_LABEL = {
-  '1-SUSPECT': 'Suspect', '2-PROSPECT': 'Prospect', '3-APPL_START': 'App Started',
-  '4-APPL_SUBMIT': 'App Submitted', '5-ADMIT': 'Admitted', '6-DEPOSIT': 'Deposited', '7-ENROLL': 'Enrolled'
+  '1-SUSPECT':           'Suspect',
+  '2-PROSPECT':          'Prospect',
+  '3-APPL_START':        'App Started',
+  '4-APPL_SUBMIT':       'App Submitted',
+  '5-ADMIT':             'Admitted',
+  'CONDITIONAL_5-ADMIT': 'Conditional Admit',
+  '6-DEPOSIT':           'Deposited',
+  '7-ENROLL':            'Enrolled',
 };
+function stageLabel(s) { return STAGE_LABEL[s] || s; }
 
 // ---------- INIT ----------
 function init(rows) {
@@ -2809,20 +2851,27 @@ function init(rows) {
 }
 
 function populateFilters() {
-  // Terms: chronological ascending (oldest at top), non-standard then blank
-  // at the very bottom. Include blank-term records via the sentinel so they
-  // are user-selectable; default-selection logic ignores them.
-  const allTerms = Array.from(new Set(RAW.map(r => r['Intended Term'])));
-  allTerms.sort((a, b) => parseTerm(a).sortKey - parseTerm(b).sortKey);
-  els.term.innerHTML = allTerms.map(t => {
-    const p = parseTerm(t);
-    const val = t === '' ? BLANK_TERM_VALUE : t;
-    return `<option value="${escapeAttr(val)}">${escapeHtml(p.label)}</option>`;
-  }).join('');
+  // Terms: collapse to one option per group key (standard terms each have
+  // their own key; all blank-kind values share BLANK_TERM_VALUE). Sort by the
+  // group's sortKey so Spring/Summer/Fall years stay chronological, "Beyond"
+  // sits just after each year, and (blank/undefined) ends up at the bottom.
+  const groups = new Map();  // groupKey -> { label, sortKey }
+  for (const t of RAW.map(r => r['Intended Term'])) {
+    const key = termGroupKey(t);
+    if (!groups.has(key)) {
+      const p = parseTerm(t);
+      groups.set(key, { label: p.label, sortKey: p.sortKey });
+    }
+  }
+  const sortedGroups = Array.from(groups.entries())
+    .sort((a, b) => a[1].sortKey - b[1].sortKey);
+  els.term.innerHTML = sortedGroups.map(([key, g]) =>
+    `<option value="${escapeAttr(key)}">${escapeHtml(g.label)}</option>`
+  ).join('');
 
-  // Stages dropdown: only the 7 pipeline stages (5-ADMIT covers CONDITIONAL too)
+  // Stage filter dropdown — uses display labels, not the raw "N-XXX" ids.
   els.stage.innerHTML = STAGES.map(s => {
-    const label = s === '5-ADMIT' ? '5-ADMIT (incl. Conditional)' : s;
+    const label = s === '5-ADMIT' ? `${stageLabel(s)} (incl. Conditional)` : stageLabel(s);
     return `<option value="${escapeAttr(s)}">${escapeHtml(label)}</option>`;
   }).join('');
 
@@ -2856,9 +2905,11 @@ function setDefaultTermFilter() {
   const target = termsAround(center, 0, 3);
   Array.from(els.term.options).forEach(opt => {
     const raw = opt.value === BLANK_TERM_VALUE ? '' : opt.value;
-    const k = parseTerm(raw).sortKey;
-    // target holds yyyymm integers; blank's sortKey is 1e9+1 so it never matches.
-    opt.selected = target.includes(k);
+    const p = parseTerm(raw);
+    // Select if (a) it's in the rolling window, OR (b) it's a "Beyond" term.
+    // Future-proof for when Element451 adds "2027 and Beyond", "2028 and
+    // Beyond", etc. — they all light up automatically.
+    opt.selected = target.includes(p.sortKey) || p.kind === 'beyond';
   });
 }
 
@@ -2878,9 +2929,13 @@ function applyFilters() {
     return VIEWS[viewKey].filter(pipeline);
   }
 
-  // Decode the blank-term sentinel back to '' so the equality check against
-  // r['Intended Term'] works without special-casing further down.
-  const terms = getSelected(els.term).map(t => t === BLANK_TERM_VALUE ? '' : t);
+  // Term selection is split: specific raw values for standard/Beyond terms, and
+  // a "match anything that parses as blank" flag for the (blank/undefined)
+  // group (covers literal empty string AND junk values like "1", "2", "3").
+  const selectedTerms = getSelected(els.term);
+  const acceptBlankGroup = selectedTerms.includes(BLANK_TERM_VALUE);
+  const specificTerms = new Set(selectedTerms.filter(t => t !== BLANK_TERM_VALUE));
+  const termFilterActive = selectedTerms.length > 0;
   const virtualStages = getSelected(els.stage);
   // Expand virtual stages (e.g. 5-ADMIT → 5-ADMIT + CONDITIONAL_5-ADMIT)
   const stageSet = new Set();
@@ -2897,7 +2952,12 @@ function applyFilters() {
     const stage = r['Active Stage'];
     // Always exclude DEFERRED / WITHDRAW / DENIED from this pipeline view
     if (EXCLUDED_STAGES.includes(stage)) return false;
-    if (terms.length && !terms.includes(r['Intended Term'])) return false;
+    if (termFilterActive) {
+      const rowTerm = r['Intended Term'];
+      const matchesSpecific = specificTerms.has(rowTerm);
+      const matchesBlank    = acceptBlankGroup && parseTerm(rowTerm).kind === 'blank';
+      if (!matchesSpecific && !matchesBlank) return false;
+    }
     if (virtualStages.length && !stageSet.has(stage)) return false;
     if (major && r['Intended Major'] !== major) return false;
     if (from || to) {
@@ -2923,17 +2983,37 @@ function render() {
   renderConversion(filtered);
   renderLeads(filtered);
 
-  // Update report meta — match Student Journey "Last Updated …" format
-  const today = new Date();
-  const dateStr = today.toISOString().slice(0,10);
-  const timeStr = today.toTimeString().slice(0,5);
+  // Update report meta. "Last Updated" reflects when the build script last
+  // pulled fresh data from Element451 (injected into the HTML at build time),
+  // NOT when the page was loaded. Rendered in 12-hour Eastern Time.
+  const refreshNode = document.getElementById('data-refreshed-at');
+  let refreshedAt = null;
+  try {
+    const raw = JSON.parse(refreshNode.textContent);
+    if (raw && raw !== 'NOT_YET_SET') refreshedAt = new Date(raw);
+  } catch (_) { /* fall back below */ }
+  // Safety net: if the build didn't substitute the placeholder for some reason,
+  // show the page-load time so the topbar isn't blank.
+  if (!refreshedAt || isNaN(refreshedAt)) refreshedAt = new Date();
+
+  const refreshedLabel = refreshedAt.toLocaleString('en-US', {
+    timeZone:     'America/New_York',
+    year:         'numeric',
+    month:        'short',
+    day:          'numeric',
+    hour:         'numeric',
+    minute:       '2-digit',
+    hour12:       true,
+    timeZoneName: 'short',  // renders as EST in winter, EDT in summer
+  });
+
   const center = currentTermKey();
   const termLabel = (() => {
     const m = center % 100, y = Math.floor(center/100);
     const name = { 1: 'Spring', 5: 'Summer', 9: 'Fall' }[m] || '';
     return `${name} ${y}`;
   })();
-  els.reportMeta.innerHTML = `Last Updated ${dateStr} ${timeStr} · Term ${termLabel}<br><span style="opacity:.75">${RAW.length.toLocaleString()} records loaded</span>`;
+  els.reportMeta.innerHTML = `Last Updated ${escapeHtml(refreshedLabel)} · Term ${termLabel}<br><span style="opacity:.75">${RAW.length.toLocaleString()} records loaded</span>`;
 }
 
 function renderKPIs(rows) {
@@ -2975,24 +3055,33 @@ function renderKPIs(rows) {
 }
 
 function renderMatrix(rows) {
-  // Terms shown: whatever passes the term filter, chronological ascending.
-  // Include '' so blank-term rows appear when the user selects them.
-  const termList = Array.from(new Set(rows.map(r => r['Intended Term'])));
-  termList.sort((a, b) => parseTerm(a).sortKey - parseTerm(b).sortKey);
+  // Terms shown: one row per term GROUP. Standard/Beyond terms get their own
+  // group; all blank-kind values (empty string, "1", "2", "3", etc.) collapse
+  // into the single BLANK_TERM_VALUE bucket.
+  const groups = new Map();  // groupKey -> { label, sortKey }
+  for (const r of rows) {
+    const key = termGroupKey(r['Intended Term']);
+    if (!groups.has(key)) {
+      const p = parseTerm(r['Intended Term']);
+      groups.set(key, { label: p.label, sortKey: p.sortKey });
+    }
+  }
+  const termList = Array.from(groups.entries())
+    .sort((a, b) => a[1].sortKey - b[1].sortKey)
+    .map(([key]) => key);
 
   // Columns: the 7 pipeline stages (5-ADMIT folds in CONDITIONAL_5-ADMIT).
   const cols = STAGES.slice();
 
-  // counts[term][virtualStage] — apply rollup so CONDITIONAL counts as 5-ADMIT.
-  // Use the raw term value (incl. '') as the key so the termList iteration
-  // below lines up with the counts dict.
+  // counts[groupKey][virtualStage] — apply both rollups (CONDITIONAL → 5-ADMIT
+  // for stages, and blank-kind → BLANK_TERM_VALUE for terms).
   const counts = {};
   for (const r of rows) {
-    const t = r['Intended Term'];
+    const gKey = termGroupKey(r['Intended Term']);
     const virt = ROLLUP_STAGE[r['Active Stage']];
     if (!virt) continue; // unknown / excluded stage
-    if (!counts[t]) counts[t] = {};
-    counts[t][virt] = (counts[t][virt] || 0) + 1;
+    if (!counts[gKey]) counts[gKey] = {};
+    counts[gKey][virt] = (counts[gKey][virt] || 0) + 1;
   }
   const colTotal = {}; cols.forEach(c => colTotal[c] = 0);
   let grandTotal = 0;
@@ -3020,25 +3109,22 @@ function renderMatrix(rows) {
   });
   html += `<td class="cell col-total" data-term="" data-stage="">${grandTotal}</td></tr>`;
 
-  // Per-term rows below the totals.
+  // Per-term rows below the totals. `t` is now a group key — already the
+  // sentinel for blank groups, already the raw string for standard/Beyond.
   termList.forEach(t => {
     const rowTotal = cols.reduce((a, c) => a + ((counts[t] && counts[t][c]) || 0), 0);
     if (!rowTotal) return;
-    const label = parseTerm(t).label;
-    // For blank-term rows we emit the sentinel in data-term so the cell click
-    // can distinguish "this blank-term row" from "the Total row" (which uses
-    // data-term="" to mean any term).
-    const termAttr = t === '' ? BLANK_TERM_VALUE : t;
-    const rowActive = selectedCell && selectedCell.term === termAttr && !selectedCell.stage ? 'row-active' : '';
+    const label = groups.get(t).label;
+    const rowActive = selectedCell && selectedCell.term === t && !selectedCell.stage ? 'row-active' : '';
     html += `<tr class="${rowActive}"><td>${escapeHtml(label)}</td>`;
     cols.forEach((c, i) => {
       const v = (counts[t] && counts[t][c]) || 0;
-      const isActive = selectedCell && selectedCell.term === termAttr && selectedCell.stage === c;
+      const isActive = selectedCell && selectedCell.term === t && selectedCell.stage === c;
       const cls = `cell col-s${i+1}${isActive ? ' active' : ''}`;
-      html += `<td class="${cls}" data-term="${escapeAttr(termAttr)}" data-stage="${escapeAttr(c)}">${v || ''}</td>`;
+      html += `<td class="${cls}" data-term="${escapeAttr(t)}" data-stage="${escapeAttr(c)}">${v || ''}</td>`;
     });
-    const totalActive = selectedCell && selectedCell.term === termAttr && !selectedCell.stage;
-    html += `<td class="cell col-total${totalActive ? ' active' : ''}" data-term="${escapeAttr(termAttr)}" data-stage="">${rowTotal}</td></tr>`;
+    const totalActive = selectedCell && selectedCell.term === t && !selectedCell.stage;
+    html += `<td class="cell col-total${totalActive ? ' active' : ''}" data-term="${escapeAttr(t)}" data-stage="">${rowTotal}</td></tr>`;
   });
 
   html += '</tbody>';
@@ -3140,14 +3226,18 @@ function renderLeads(filtered) {
   let rows = filtered;
   if (selectedCell) {
     const stageMatch = selectedCell.stage ? new Set(STAGE_INCLUDES[selectedCell.stage] || [selectedCell.stage]) : null;
-    // Decode the blank-term sentinel back to '' so the equality check works.
-    // selectedCell.term === '' still means "any term" (Total-row click) and
-    // shouldn't filter; selectedCell.term === BLANK_TERM_VALUE means "filter
-    // to records whose Intended Term is empty".
-    const wantTerm = selectedCell.term === BLANK_TERM_VALUE ? '' : selectedCell.term;
-    const termIsConstrained = !!selectedCell.term;  // truthy for any specific selection (sentinel is truthy)
+    // selectedCell.term: '' = "any term" (Total-row click), BLANK_TERM_VALUE =
+    // any blank-kind term (covers "", "1", "2", "3", etc.), otherwise the
+    // specific standard/Beyond term to match exactly.
+    const termIsConstrained = !!selectedCell.term;
     rows = rows.filter(r => {
-      if (termIsConstrained && r['Intended Term'] !== wantTerm) return false;
+      if (termIsConstrained) {
+        if (selectedCell.term === BLANK_TERM_VALUE) {
+          if (parseTerm(r['Intended Term']).kind !== 'blank') return false;
+        } else if (r['Intended Term'] !== selectedCell.term) {
+          return false;
+        }
+      }
       if (stageMatch && !stageMatch.has(r['Active Stage'])) return false;
       return true;
     });
@@ -3182,7 +3272,7 @@ function renderLeads(filtered) {
       <td>${link}</td>
       <td>${escapeHtml(r['Last Name'])}</td>
       <td>${escapeHtml(r['First Name'])}</td>
-      <td><span class="status-pill ${stageCls}">${escapeHtml(r['Active Stage'])}</span></td>
+      <td><span class="status-pill ${stageCls}">${escapeHtml(stageLabel(r['Active Stage']))}</span></td>
       <td>${escapeHtml(parseTerm(r['Intended Term']).label)}</td>
       <td>${escapeHtml(r['Intended Major'])}</td>
       <td>${escapeHtml(r['Referred By'])}</td>
