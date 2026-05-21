@@ -134,7 +134,22 @@ table.matrix tbody tr.row-active td { box-shadow: inset 4px 0 0 var(--accent); }
 .leads-section .panel-head .clear-link { color:var(--brand); cursor:pointer; font-size:12px; font-weight:600; text-decoration:underline; }
 .leads-scroll { max-height:460px; overflow:auto; border:1px solid var(--border); border-radius:0 0 10px 10px; background:#fff; }
 table.leads { width:100%; border-collapse:collapse; font-size:12.5px; }
-table.leads thead th { position:sticky; top:0; background:var(--brand); color:#fff; padding:9px 10px; text-align:left; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-bottom:2px solid #0a3478; z-index:2; white-space:nowrap; }
+table.leads thead th { position:sticky; top:0; background:var(--brand); color:#fff; padding:9px 10px; text-align:left; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-bottom:2px solid #0a3478; z-index:2; white-space:nowrap; vertical-align:top; }
+/* Column-header dropdown filter — appears under the header label so the user
+   can narrow the lead list by Stage / Term / Major without leaving the table.
+   Stays sticky with the rest of the thead. */
+table.leads thead th.th-filterable { padding-bottom:5px; }
+table.leads thead th.th-filterable .lbl { margin-bottom:3px; }
+table.leads thead th .col-filter {
+  display:block; width:100%; font:11px inherit; padding:2px 4px;
+  border:1px solid rgba(255,255,255,0.4); border-radius:4px;
+  background:rgba(255,255,255,0.08); color:#fff;
+  text-transform:none; letter-spacing:0; font-weight:500;
+  cursor:pointer;
+}
+table.leads thead th .col-filter:hover { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.7); }
+table.leads thead th .col-filter:focus { outline:none; background:#fff; color:var(--ink); border-color:var(--accent); }
+table.leads thead th .col-filter option { color:#1a2333; background:#fff; }
 table.leads tbody td { padding:7px 10px; border-bottom:1px solid #e1e6ee; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; }
 table.leads tbody tr:nth-child(even) { background:var(--row-alt); }
 table.leads tbody tr:hover { background:#e8eef8; }
@@ -189,17 +204,14 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
 </section>
 
 <section class="filters">
+  <label class="fld">Search Name
+    <input type="text" id="fName" placeholder="First or last name…" autocomplete="off" spellcheck="false" style="min-width:180px">
+  </label>
   <label class="fld">Intended Term
     <select id="fTerm" multiple size="3"></select>
   </label>
   <label class="fld">Active Stage
     <select id="fStage" multiple size="3"></select>
-  </label>
-  <label class="fld">Intended Major
-    <select id="fMajor"></select>
-  </label>
-  <label class="fld">Last Form
-    <select id="fForm"></select>
   </label>
   <label class="fld">Created From
     <input type="date" id="fFrom">
@@ -227,9 +239,15 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
   <div class="leads-scroll">
     <table class="leads" id="leadsTable">
       <thead><tr>
-        <th>Created</th><th></th><th>Last Name</th><th>First Name</th><th>Stage</th>
-        <th>Term</th><th>Major</th><th>Email</th><th>Last Form</th>
-        <th>Referred By</th><th>Last Activity</th><th>Last Event</th>
+        <th>Created</th>
+        <th></th>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th class="th-filterable"><div class="lbl">Stage</div><select class="col-filter" id="hfStage"></select></th>
+        <th class="th-filterable"><div class="lbl">Term</div><select class="col-filter" id="hfTerm"></select></th>
+        <th class="th-filterable"><div class="lbl">Major</div><select class="col-filter" id="hfMajor"></select></th>
+        <th>Referred By</th>
+        <th>Last Activity</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -962,7 +980,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 10/02/2024,Saleeha,Soofi,1-SUSPECT,January 2024,4 Year MD Program,saso0002@ausoma.org,,,,emailDelivered,,Historic Data (HubSpot),66fd630ceaf366e2120b3253
 10/02/2024,Jong,Lee,7-ENROLL,January 2024,4 Year MD Program,jole0035@ausoma.org,,,,emailOpened,,Historic Data (HubSpot),66fd630ceaf366e2120b3256
 10/02/2024,Thanh,Tran,1-SUSPECT,January 2024,4 Year MD Program,tnt6779@yahoo.com,,,,emailOpened,,Historic Data (HubSpot),66fd630ceaf366e2120b3259
-10/02/2024,Gae,Lee,2-PROSPECT,1,Clinical Medicine Program (CMP),gale0040@ausoma.org,ausoma.forms.7888,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,Historic Data (HubSpot),66fd630ceaf366e2120b325c
+10/02/2024,Gae,Lee,7-ENROLL,January 2024,Clinical Medicine Program (CMP),gale0040@ausoma.org,ausoma.forms.7888,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,Historic Data (HubSpot),66fd630ceaf366e2120b325c
 10/02/2024,Natali,Shvarzman,1-SUSPECT,September 2023,,shvarzman.n@gmail.com,,,,userCreated,,Historic Data (HubSpot),66fd630d24927ecd5c06605c
 10/02/2024,Marie,Jean Baptiste,1-SUSPECT,September 2023,,mariejb1979@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd630d24927ecd5c06605f
 10/02/2024,Salisha,Phillip,1-SUSPECT,September 2023,,nishaphillip75@gmail.com,,,,emailDelivered,,Historic Data (HubSpot),66fd630d24927ecd5c066062
@@ -2429,7 +2447,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 09/10/2025,Wildalis,Cossi,APPLICATION_START,,,cossiwildalis@gmail.com,,,09/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c1bd43c91e533aa205865c
 09/11/2025,Olivia,Di Serio,APPLICATION_START,September 2026,,olivia.diserio@icloud.com,,,12/01/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c2f1d8b8f271e1dd007626
 09/14/2025,Syed,Ghaus,APPLICATION_START,May 2026,,waleedghaus19@gmail.com,,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68c74326d8e67417d70b61aa
-09/18/2025,Maya,Ferrer,6-DEPOSIT,May 2026,4 Year MD Program,mayaisabella607@gmail.com,ausoma.forms.7570,,03/24/2026,emailDelivered,66ba570d99100a2a2a0b2f32,"Unresponsive,Conditional Admission",68cc4711fa54eabad401c59f
+09/18/2025,Maya,Ferrer,6-DEPOSIT,September 2026,4 Year MD Program,mayaisabella607@gmail.com,ausoma.forms.7570,,03/24/2026,emailDelivered,66ba570d99100a2a2a0b2f32,Conditional Admission,68cc4711fa54eabad401c59f
 09/19/2025,Giovanca,Bislik,2-PROSPECT,January 2026,5 Year Pre-Med MD Program,giovanca.bislik@gmail.com,ausoma.forms.7172,,09/23/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68cd782656b092770005c057
 09/23/2025,Kariannys,Parra trompiz,APPLICATION_START,,,parrakariannys84@gmail.com,,,09/25/2025,emailDelivered,,,68d2a9a3a543dd446500c3ff
 09/24/2025,jenifer,harilall,2-PROSPECT,January 2026,4 Year MD Program,jeniferharilall2003@gmail.com,ausoma.forms.7888,,10/15/2025,emailDelivered,,,68d440bf75ac82c60b0e3086
@@ -2483,7 +2501,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/15/2025,Haley,Pietras,1-SUSPECT,,,hapi0003@ausoma.org,,,,emailOpened,,,6917c389cb5287c6ed0d2320
 11/15/2025,Sheila,Bridges,1-SUSPECT,,,shbr0008@ausoma.org,,,,emailDelivered,,,6917c389cb5287c6ed0d2323
 11/15/2025,Nazir,Dilipchand,1-SUSPECT,,,nadi0004@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d2326
-11/15/2025,Osaheni,Amadasu,2-PROSPECT,3,4 Year MD Program,osam0006@ausoma.org,ausoma.forms.7888,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,,6917c38acb5287c6ed0d2329
+11/15/2025,Osaheni,Amadasu,7-ENROLL,January 2026,4 Year MD Program,osam0006@ausoma.org,ausoma.forms.7888,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,,6917c38acb5287c6ed0d2329
 11/15/2025,Maria,Giron,1-SUSPECT,,,magi0007@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d232c
 11/15/2025,Tapish,Patel,1-SUSPECT,,,tapa0009@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d232f
 11/15/2025,Nnenna,Nnaji,1-SUSPECT,,,ainn0011@ausoma.org,,,,emailDelivered,,,6917c38acb5287c6ed0d2332
@@ -2679,12 +2697,16 @@ let donutChart = null;
 let selectedCell = null; // { term: 'May 2026', stage: '5-ADMIT' } or null
 
 const els = {
+  name: document.getElementById('fName'),
   term: document.getElementById('fTerm'),
   stage: document.getElementById('fStage'),
-  major: document.getElementById('fMajor'),
-  form: document.getElementById('fForm'),
   from: document.getElementById('fFrom'),
   to: document.getElementById('fTo'),
+  // Column-header dropdowns — local filters that narrow the lead list only,
+  // they do not affect the matrix or KPI counts.
+  hfStage: document.getElementById('hfStage'),
+  hfTerm:  document.getElementById('hfTerm'),
+  hfMajor: document.getElementById('hfMajor'),
   reset: document.getElementById('btnReset'),
   file: document.getElementById('csvFile'),
   matrix: document.getElementById('matrix'),
@@ -2727,13 +2749,21 @@ function populateFilters() {
     return `<option value="${escapeAttr(s)}">${escapeHtml(label)}</option>`;
   }).join('');
 
-  // Major
+  // Lead-list column header filters (local to lead list, not the matrix).
+  // Stage: same 7 pipeline stages as the top-bar filter.
+  els.hfStage.innerHTML = '<option value="">All</option>' + STAGES.map(s => {
+    const label = s === '5-ADMIT' ? '5-ADMIT (incl. Conditional)' : s;
+    return `<option value="${escapeAttr(s)}">${escapeHtml(label)}</option>`;
+  }).join('');
+  // Term: every unique term value, chronological ascending with non-standard
+  // values at the bottom — matches the top-bar Term order.
+  els.hfTerm.innerHTML = '<option value="">All</option>' + allTerms.map(t => {
+    const p = parseTerm(t);
+    return `<option value="${escapeAttr(t)}">${escapeHtml(p.label)}</option>`;
+  }).join('');
+  // Major: alphabetical.
   const majors = Array.from(new Set(RAW.map(r => r['Intended Major']))).filter(Boolean).sort();
-  els.major.innerHTML = '<option value="">All Majors</option>' + majors.map(m => `<option value="${escapeAttr(m)}">${m}</option>`).join('');
-
-  // Form
-  const forms = Array.from(new Set(RAW.map(r => r['Last Form']))).filter(Boolean).sort();
-  els.form.innerHTML = '<option value="">All</option>' + forms.map(f => `<option value="${escapeAttr(f)}">${f}</option>`).join('');
+  els.hfMajor.innerHTML = '<option value="">All</option>' + majors.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
 
   // Date range — set min/max
   const dates = RAW.map(r => parseUSDate(r['Created Date'])).filter(d => d).sort((a,b) => a - b);
@@ -2766,11 +2796,12 @@ function applyFilters() {
   // Expand virtual stages (e.g. 5-ADMIT → 5-ADMIT + CONDITIONAL_5-ADMIT)
   const stageSet = new Set();
   virtualStages.forEach(v => (STAGE_INCLUDES[v] || [v]).forEach(s => stageSet.add(s)));
-  const major = els.major.value;
-  const form = els.form.value;
   const from = els.from.value ? new Date(els.from.value) : null;
   const to = els.to.value ? new Date(els.to.value) : null;
   if (to) to.setHours(23,59,59,999);
+  // Name search — case-insensitive substring against First + Last + combined.
+  // Whitespace-tolerant so "john smith" matches against "John" "Smith".
+  const nameQuery = (els.name.value || '').trim().toLowerCase();
 
   return RAW.filter(r => {
     const stage = r['Active Stage'];
@@ -2778,13 +2809,17 @@ function applyFilters() {
     if (EXCLUDED_STAGES.includes(stage)) return false;
     if (terms.length && !terms.includes(r['Intended Term'])) return false;
     if (virtualStages.length && !stageSet.has(stage)) return false;
-    if (major && r['Intended Major'] !== major) return false;
-    if (form && r['Last Form'] !== form) return false;
     if (from || to) {
       const d = parseUSDate(r['Created Date']);
       if (!d) return false;
       if (from && d < from) return false;
       if (to && d > to) return false;
+    }
+    if (nameQuery) {
+      const fn = (r['First Name'] || '').toLowerCase();
+      const ln = (r['Last Name']  || '').toLowerCase();
+      const combined = `${fn} ${ln}`;
+      if (!fn.includes(nameQuery) && !ln.includes(nameQuery) && !combined.includes(nameQuery)) return false;
     }
     return true;
   });
@@ -3013,6 +3048,18 @@ function renderLeads(filtered) {
       return true;
     });
   }
+  // Column-header dropdown filters narrow the lead list further (do NOT affect
+  // the matrix or KPI cards above). Stage uses STAGE_INCLUDES so picking
+  // 5-ADMIT also pulls in CONDITIONAL_5-ADMIT records.
+  const hfStageVal = els.hfStage.value;
+  const hfTermVal  = els.hfTerm.value;
+  const hfMajorVal = els.hfMajor.value;
+  if (hfStageVal) {
+    const stageMatch = new Set(STAGE_INCLUDES[hfStageVal] || [hfStageVal]);
+    rows = rows.filter(r => stageMatch.has(r['Active Stage']));
+  }
+  if (hfTermVal)  rows = rows.filter(r => r['Intended Term']  === hfTermVal);
+  if (hfMajorVal) rows = rows.filter(r => r['Intended Major'] === hfMajorVal);
   // Default sort: by Stage DESCENDING (7-Enroll first, then 6-Deposit, ..., 1-Suspect last).
   // CONDITIONAL_5-ADMIT slots alongside 5-ADMIT via STAGE_ORDER.
   // Within a stage, sort by Intended Term (chronological), then Created Date (newest first).
@@ -3046,19 +3093,16 @@ function renderLeads(filtered) {
       <td><span class="status-pill ${stageCls}">${escapeHtml(r['Active Stage'])}</span></td>
       <td>${escapeHtml(parseTerm(r['Intended Term']).label)}</td>
       <td>${escapeHtml(r['Intended Major'])}</td>
-      <td>${escapeHtml(r['Email'])}</td>
-      <td>${escapeHtml(r['Last Form'])}</td>
       <td>${escapeHtml(r['Referred By'])}</td>
       <td>${escapeHtml(r['Last Activity'])}</td>
-      <td>${escapeHtml(r['Last Event'])}</td>
     </tr>`;
   }).join('');
 
   if (rows.length > max) {
-    els.leadsBody.innerHTML += `<tr><td colspan="12" class="empty">Showing first ${max} of ${rows.length.toLocaleString()} — narrow filters or export to see all.</td></tr>`;
+    els.leadsBody.innerHTML += `<tr><td colspan="9" class="empty">Showing first ${max} of ${rows.length.toLocaleString()} — narrow filters or export to see all.</td></tr>`;
   }
   if (!rows.length) {
-    els.leadsBody.innerHTML = `<tr><td colspan="12" class="empty">No leads match the current filters.</td></tr>`;
+    els.leadsBody.innerHTML = `<tr><td colspan="9" class="empty">No leads match the current filters.</td></tr>`;
   }
 }
 
@@ -3076,15 +3120,24 @@ function escapeAttr(s) { return escapeHtml(s); }
 
 // ---------- EVENTS ----------
 ['change','input'].forEach(ev => {
-  ['fTerm','fStage','fMajor','fForm','fFrom','fTo'].forEach(id => {
+  ['fName','fTerm','fStage','fFrom','fTo'].forEach(id => {
     document.getElementById(id).addEventListener(ev, () => { selectedCell = null; render(); });
   });
 });
+// Header-column dropdowns: changing one re-renders the lead list only. Don't
+// clear selectedCell here — the user may want to keep their matrix-cell drill
+// active and just narrow further with a header value.
+['hfStage','hfTerm','hfMajor'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => render());
+});
 els.reset.addEventListener('click', () => {
+  els.name.value = '';
   setDefaultTermFilter();
   Array.from(els.stage.options).forEach(o => o.selected = false);
-  els.major.value = '';
-  els.form.value = '';
+  // Clear the column-header dropdowns too so Reset means a true clean slate.
+  els.hfStage.value = '';
+  els.hfTerm.value  = '';
+  els.hfMajor.value = '';
   const dates = RAW.map(r => parseUSDate(r['Created Date'])).filter(Boolean).sort((a,b) => a-b);
   if (dates.length) {
     els.from.value = isoDate(dates[0]);
