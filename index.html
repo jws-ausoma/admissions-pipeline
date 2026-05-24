@@ -140,6 +140,11 @@ table.matrix tbody tr.row-active td { box-shadow: inset 4px 0 0 var(--accent); }
 .leads-scroll { max-height:460px; overflow:auto; border:1px solid var(--border); border-radius:0 0 10px 10px; background:#fff; }
 table.leads { width:100%; border-collapse:collapse; font-size:12.5px; }
 table.leads thead th { position:sticky; top:0; background:var(--brand); color:#fff; padding:9px 10px; text-align:left; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-bottom:2px solid #0a3478; z-index:2; white-space:nowrap; }
+table.leads thead th[data-sort] { cursor:pointer; user-select:none; }
+table.leads thead th[data-sort]:hover { background:#0a3478; }
+table.leads thead th[data-sort]::after { content:""; display:inline-block; width:0; margin-left:6px; opacity:.55; font-size:9px; vertical-align:middle; }
+table.leads thead th.sort-asc::after  { content:"\25B2"; width:auto; opacity:1; }
+table.leads thead th.sort-desc::after { content:"\25BC"; width:auto; opacity:1; }
 table.leads tbody td { padding:7px 10px; border-bottom:1px solid #e1e6ee; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; }
 table.leads tbody tr:nth-child(even) { background:var(--row-alt); }
 table.leads tbody tr:hover { background:#e8eef8; }
@@ -241,15 +246,15 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
   <div class="leads-scroll">
     <table class="leads" id="leadsTable">
       <thead><tr>
-        <th>Created</th>
+        <th data-sort="Created Date">Created</th>
         <th></th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Stage</th>
-        <th>Term</th>
-        <th>Major</th>
-        <th>Referred By</th>
-        <th>Last Activity</th>
+        <th data-sort="Last Name">Last Name</th>
+        <th data-sort="First Name">First Name</th>
+        <th data-sort="Active Stage">Stage</th>
+        <th data-sort="Intended Term">Term</th>
+        <th data-sort="Intended Major">Major</th>
+        <th data-sort="Referred By">Referred By</th>
+        <th data-sort="Last Activity">Last Activity</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -278,7 +283,7 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
      UTC ISO time the Element451 fetch ran. Stays "NOT_YET_SET" if a build
      somehow shipped without substitution; the dashboard falls back to page
      load time in that case. -->
-<script id="data-refreshed-at" type="application/json">"2026-05-24T20:15:04.538964+00:00"</script>
+<script id="data-refreshed-at" type="application/json">"2026-05-24T20:45:22.658162+00:00"</script>
 
 <!-- Bootstrap data: embedded Element451 export -->
 <script type="text/csv" id="bootstrap-csv">
@@ -2372,7 +2377,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 05/11/2025,Amanda,Crissman,2-PROSPECT,January 2026,4 Year MD Program,beaker46@hotmail.com,ausoma.forms.7116,Crissman,06/12/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,681fee1c5136fc33e702aa9c
 05/11/2025,Allison,Yarber,2-PROSPECT,May 2025,Clinical Medicine Program (CMP),dylan19allison@yahoo.com,ausoma.forms.7116,sw,05/12/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,681fef885b08a22a6805b821
 05/13/2025,Laura,Brown,2-PROSPECT,January 2026,4 Year MD Program,lltidwell7@verizon.net,ausoma.forms.7172,,05/19/2025,emailUnsubscribed,66ba570d99100a2a2a0b2f32,unqualified lead,6822b6bc844cc19a4f0793a0
-05/13/2025,Majd,Oteibi,3-APPL_START,September 2026,Clinical Medicine Program (CMP),drmaj01@gmail.com,,,,appointmentUpdated,6a0b87cd894a5a1d6e00028a,,6822f9563fecb35d4e08753e
+05/13/2025,Majd,Oteibi,3-APPL_START,September 2026,4 Year MD Program,drmaj01@gmail.com,,,,appointmentAttended,6a0b87cd894a5a1d6e00028a,,6822f9563fecb35d4e08753e
 05/14/2025,Sibiri,Balong,2-PROSPECT,September 2025,4 Year MD Program,nuhadbalong@yahoo.co.uk,ausoma.forms.7570,,08/20/2025,emailOpened,66ba570d99100a2a2a0b2f32,Admitted,6824d48baefacab8ce0b7a03
 05/16/2025,Moshin,Azam,2-PROSPECT,January 2026,4 Year MD Program,mohsinazam143@gmail.com,ausoma.forms.7116,"Please contact me by email, thank you",08/20/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,6826962dfe9bd9787301cf73
 05/16/2025,Rachel,Deane,2-PROSPECT,January 2026,5 Year Pre-Med MD Program,raedeane@gmail.com,ausoma.forms.7116,,05/19/2025,smsUnsubscribed,66ba570d99100a2a2a0b2f32,unqualified lead,68269b6951ff1154ea0f3da6
@@ -2430,7 +2435,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 07/21/2025,Paria,Ghassemi,4-APPL_SUBMIT,January 2026,4 Year MD Program,drpariaghassemii@gmail.com,ausoma.forms.7359,,09/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,687e43b0ae1f1fbee8019038
 07/21/2025,Daniela,Oduber,3-APPL_START,September 2025,,danielaoduber2212@gmail.com,,,07/22/2025,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,687ea3cc826f756b990a9ad5
 07/29/2025,Ansh,Narang,2-PROSPECT,September 2025,5 Year Pre-Med MD Program,vinkyn12@gmail.com,,,08/05/2025,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68890fe036231943b402aee5
-08/05/2025,h,j,4-APPL_SUBMIT,September 2025,,iandan8806@gmail.com,,,,emailDelivered,66ba570d99100a2a2a0b2f32,,689207ce71c070713e014eb0
+08/05/2025,h,j,4-APPL_SUBMIT,September 2025,4 Year MD Program,iandan8806@gmail.com,,,,emailDelivered,66ba570d99100a2a2a0b2f32,,689207ce71c070713e014eb0
 08/06/2025,Keely,Darichuk,2-PROSPECT,September 2025,,keelydarichuk@gmail.com,,,,emailOpened,,,6892a8bdb20bee32d90643b3
 08/06/2025,Janeen,Saunders,3-APPL_START,September 2025,,janeencamillas.elitemedia@gmail.com,,,,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6893993d1c873a30aa070748
 08/08/2025,Andrea Serese,Manson,1-SUSPECT,September 2025,4 Year MD Program,andreamanson@yahoo.com,ausoma.forms.7359,,,formSubmitted,,,68961d0959a3b82744081ff6
@@ -2446,38 +2451,38 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 08/21/2025,Kelly,Patel,4-APPL_SUBMIT,January 2026,4 Year MD Program,kellypatel999@gmail.com,,,11/03/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68a7a93ef759dcb9330b5cfc
 08/24/2025,ALHASAN,AL-ELAYAWI,5-ADMIT,January 2026,5 Year Pre-Med MD Program,alhasansalam323@gmail.com,ausoma.forms.7116,friend of main (zahraa),09/23/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Admitted,68ab95fbee58eff5720e8fea
 08/27/2025,Irene,Donnelly,2-PROSPECT,January 2025,Clinical Medicine Program (CMP),idonnelly186@gmail.com,ausoma.forms.7116,,10/15/2025,emailOpened,66ba570d99100a2a2a0b2f32,,68ae6fb27eed25d1030abf5d
-08/28/2025,Bom,Bong,3-APPL_START,,,bom_b.o.n.g@hotmail.com,,,10/15/2025,emailUnsubscribed,66ba570d99100a2a2a0b2f32,Unresponsive,68afafe00083794a3702e8d1
-08/28/2025,Rylee,Erickson,3-APPL_START,,,ryleee1000@gmail.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68b0c94684c830bd9b05b5df
-08/30/2025,aiza,asim,3-APPL_START,,,aizaasim98@gmail.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"International Student,Unresponsive",68b30c7740fe2adf8003a0af
-09/10/2025,Wildalis,Cossi,3-APPL_START,,,cossiwildalis@gmail.com,,,09/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c1bd43c91e533aa205865c
+08/28/2025,Bom,Bong,3-APPL_START,January 2026,4 Year MD Program,bom_b.o.n.g@hotmail.com,,,10/15/2025,emailUnsubscribed,66ba570d99100a2a2a0b2f32,Unresponsive,68afafe00083794a3702e8d1
+08/28/2025,Rylee,Erickson,3-APPL_START,September 2025,4 Year MD Program,ryleee1000@gmail.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68b0c94684c830bd9b05b5df
+08/30/2025,aiza,asim,3-APPL_START,September 2025,4 Year MD Program,aizaasim98@gmail.com,,,10/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,"International Student,Unresponsive",68b30c7740fe2adf8003a0af
+09/10/2025,Wildalis,Cossi,3-APPL_START,January 2026,4 Year MD Program,cossiwildalis@gmail.com,,,09/15/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c1bd43c91e533aa205865c
 09/11/2025,Olivia,Di Serio,3-APPL_START,September 2026,,olivia.diserio@icloud.com,,,12/01/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68c2f1d8b8f271e1dd007626
 09/14/2025,Syed,Ghaus,3-APPL_START,May 2026,,waleedghaus19@gmail.com,,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68c74326d8e67417d70b61aa
 09/18/2025,Maya,Ferrer,6-DEPOSIT,September 2026,4 Year MD Program,mayaisabella607@gmail.com,ausoma.forms.7570,,03/24/2026,emailDelivered,66ba570d99100a2a2a0b2f32,Conditional Admission,68cc4711fa54eabad401c59f
 09/19/2025,Giovanca,Bislik,2-PROSPECT,January 2026,5 Year Pre-Med MD Program,giovanca.bislik@gmail.com,ausoma.forms.7172,,09/23/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68cd782656b092770005c057
-09/23/2025,Kariannys,Parra trompiz,3-APPL_START,,,parrakariannys84@gmail.com,,,09/25/2025,emailDelivered,,,68d2a9a3a543dd446500c3ff
+09/23/2025,Kariannys,Parra trompiz,3-APPL_START,January 2026,Clinical Medicine Program (CMP),parrakariannys84@gmail.com,,,09/25/2025,emailDelivered,,,68d2a9a3a543dd446500c3ff
 09/24/2025,jenifer,harilall,2-PROSPECT,January 2026,4 Year MD Program,jeniferharilall2003@gmail.com,ausoma.forms.7888,,10/15/2025,emailDelivered,,,68d440bf75ac82c60b0e3086
-09/26/2025,Ebram,Lamay,3-APPL_START,,,ebram.lamay23@gmail.com,,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68d6357cc29b4d2f180d1fce
-09/27/2025,Randall,Montaño,3-APPL_START,,,montanorandall@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68d80b1e64e4422a62082c74
+09/26/2025,Ebram,Lamay,3-APPL_START,January 2026,4 Year MD Program,ebram.lamay23@gmail.com,,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68d6357cc29b4d2f180d1fce
+09/27/2025,Randall,Montaño,3-APPL_START,January 2026,5 Year Pre-Med MD Program,montanorandall@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68d80b1e64e4422a62082c74
 10/02/2025,Vanessa,Marshall,2-PROSPECT,January 2026,4 Year MD Program,vanessa@nextmarkstriping.com,ausoma.forms.7116,Google,10/03/2025,emailDelivered,66ba570d99100a2a2a0b2f32,unqualified lead,68de8ea0f156ce7f830fb6a4
 10/07/2025,Manroop,Kaur,2-PROSPECT,September 2024,4 Year MD Program,manroopk2001@gmail.com,,,,emailDelivered,,,68e58ad8c5d25f2d160540c6
 10/11/2025,Brad,Olivares,2-PROSPECT,May 2025,5 Year Pre-Med MD Program,bradolivares@professionalbusinessprofile.com,ausoma.forms.7116,Get A Wikipedia Page For Yourself Or For Your Company.,11/03/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68e9aa7f085872f46d097b96
 10/11/2025,Kin,Dutta,2-PROSPECT,2028 and Beyond,5 Year Pre-Med MD Program,contact.kindutta@hotmail.com,,,,userCreated,66ba570d99100a2a2a0b2f32,unqualified lead,68e9b3d0e9dda8599c0d478a
-10/12/2025,Violette,Jean Louis,DENIED,January 2026,,gabrielherveypierre@gmail.com,,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68ebfd23f1c8bbf95203377a
+10/12/2025,Violette,Jean Louis,DENIED,January 2026,5 Year Pre-Med MD Program,gabrielherveypierre@gmail.com,,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,Unresponsive,68ebfd23f1c8bbf95203377a
 10/17/2025,john ryan,costelo,2-PROSPECT,2028 and Beyond,5 Year Pre-Med MD Program,johnryanvcostelo@gmail.com,ausoma.forms.7116,,11/03/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68f29b01857e741c850b442d
 10/18/2025,Djennie,Valmyr,2-PROSPECT,September 2025,4 Year MD Program,djennievalmyr@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68f3e6e21866fede6b040ad7
-10/19/2025,Rosinela,Neto dos Santos Gomes,3-APPL_START,,,rosinelagomes892@gmail.com,,,,emailOpened,,,68f54b04041a07839e07c149
-10/24/2025,Nasser,Golshani,3-APPL_START,,,nasservossough@yahoo.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68faedca89733200c306ed37
+10/19/2025,Rosinela,Neto dos Santos Gomes,3-APPL_START,January 2026,Clinical Medicine Program (CMP),rosinelagomes892@gmail.com,,,,emailOpened,,,68f54b04041a07839e07c149
+10/24/2025,Nasser,Golshani,3-APPL_START,January 2026,4 Year MD Program,nasservossough@yahoo.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68faedca89733200c306ed37
 10/25/2025,Muhammad,Ahmed,2-PROSPECT,September 2026,4 Year MD Program,mahmeds0382@gmail.com,ausoma.forms.7116,,11/03/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68fd11d1459627b9c5063297
-10/26/2025,Anthony,Labib,3-APPL_START,,,alabib2026@mka.org,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68fe32678dfcfd07e10a00cd
+10/26/2025,Anthony,Labib,3-APPL_START,January 2026,5 Year Pre-Med MD Program,alabib2026@mka.org,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,68fe32678dfcfd07e10a00cd
 10/26/2025,Basma,Ahmed,2-PROSPECT,September 2025,4 Year MD Program,basmaelsamak24@gmail.com,ausoma.forms.7116,My realtives,11/11/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,68fe99b4b183b292cf0c16b3
 10/27/2025,Ramziddin,Nasriddinov,3-APPL_START,,,usmonovb977@gmail.com,,,12/02/2025,smsDelivered,66ba570d99100a2a2a0b2f32,,68fecade0de8b120fb0ab2a9
-10/29/2025,Enyinnaya,Nwosu,3-APPL_START,,,nwosudavid2003@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6901c98fbcc886a12b09ad66
+10/29/2025,Enyinnaya,Nwosu,3-APPL_START,January 2026,4 Year MD Program,nwosudavid2003@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6901c98fbcc886a12b09ad66
 10/29/2025,Vanessa,Zoccatelli,3-APPL_START,January 2026,Clinical Medicine Program (CMP),vanessazoccatelli@gmail.com,ausoma.forms.7116,5920385,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,690208e191b131297603e912
 10/29/2025,Cristhian,Quiroz,2-PROSPECT,January 2026,Clinical Medicine Program (CMP),crisquiroz.med@gmail.com,ausoma.forms.7116,,11/19/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,690214ef5c37b437f10b1085
-10/30/2025,Yaw,Sakyi,3-APPL_START,,,sakyiyaw69@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6902b6229dbb9f80e104f4fc
+10/30/2025,Yaw,Sakyi,3-APPL_START,January 2026,4 Year MD Program,sakyiyaw69@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6902b6229dbb9f80e104f4fc
 10/30/2025,Ramziddin,Nasriddinov,2-PROSPECT,,,islomovramziddin1@gmail.com,,,11/11/2025,emailOpened,,,6903380276fe6e9a60001ad4
 11/02/2025,Helen,Ahn,2-PROSPECT,January 2026,4 Year MD Program,hyeeun1985@yahoo.com,ausoma.forms.7116,,11/03/2025,smsDelivered,66ba570d99100a2a2a0b2f32,,6906d5ae6fb3f9de9804c527
-11/04/2025,Sophia,Sanford,3-APPL_START,,,sophiasanford313@yahoo.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,690a0fe78fd710a19f0ac7de
+11/04/2025,Sophia,Sanford,3-APPL_START,January 2026,5 Year Pre-Med MD Program,sophiasanford313@yahoo.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,690a0fe78fd710a19f0ac7de
 11/04/2025,Kenneth,Oms,2-PROSPECT,2028 and Beyond,4 Year MD Program,kenydast@yahoo.com,,,,emailDelivered,,,690a60e8cbfc73326e0d9805
 11/07/2025,Sana,Khan,2-PROSPECT,January 2026,5 Year Pre-Med MD Program,khansana.1234.ga@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,690e33387bf8875eb40fa7a5
 11/08/2025,Janiqua,Torres,2-PROSPECT,January 2026,5 Year Pre-Med MD Program,janiquamariatorres@gmail.com,ausoma.forms.7888,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,690eabc9f8b55a1ae30d5275
@@ -2486,7 +2491,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/11/2025,Janiqua,Torres,2-PROSPECT,January 2025,5 Year Pre-Med MD Program,jbolton.rma.cst@gmail.com,,,,emailDelivered,,,691335b2b6ab81ffea029147
 11/12/2025,Krystal,Bergher,2-PROSPECT,January 2026,4 Year MD Program,krystel_bergher@yahoo.com,ausoma.forms.7116,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,,6914b9552efe91b6e10f972e
 11/13/2025,Devon,Winborne,2-PROSPECT,January 2025,4 Year MD Program,devon.winborne@me.com,,,12/02/2025,emailDelivered,,,69166b11e721434eb6091c20
-11/14/2025,Maria del mar,Matos,3-APPL_START,,,m.delmar5401@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,691709854a03b6cfba074a94
+11/14/2025,Maria del mar,Matos,3-APPL_START,January 2026,4 Year MD Program,m.delmar5401@gmail.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,691709854a03b6cfba074a94
 11/15/2025,Andrea,Manson,1-SUSPECT,,,anma0024@ausoma.org,,,,emailDelivered,,,6917c386cb5287c6ed0d2302
 11/15/2025,Khaled,Badr,1-SUSPECT,,,khaled.badr@ausoma.org,,,,emailDelivered,,,6917c387cb5287c6ed0d2305
 11/15/2025,Priscilla,Pede,1-SUSPECT,,,pede.priscilla@ausoma.org,,,,emailDelivered,,,6917c387cb5287c6ed0d2308
@@ -2509,7 +2514,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 11/15/2025,Nnenna,Nnaji,1-SUSPECT,,,ainn0011@ausoma.org,,,,emailDelivered,,,6917c38acb5287c6ed0d2332
 11/15/2025,Syed Hamna,Moin,1-SUSPECT,,,syha0012@ausoma.org,,,,emailOpened,,,6917c38acb5287c6ed0d2335
 11/15/2025,Anthony,Aldama,1-SUSPECT,,,alda0005@ausoma.org,,,,emailDelivered,,,6917c38acb5287c6ed0d233e
-11/15/2025,Hamza,Begh,3-APPL_START,,,messybb@outlook.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6917eeeeae41beaf22075923
+11/15/2025,Hamza,Begh,3-APPL_START,January 2026,4 Year MD Program,messybb@outlook.com,,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,6917eeeeae41beaf22075923
 11/19/2025,Blaise,Vanderploeg,2-PROSPECT,May 2026,4 Year MD Program,blaisevdp@yahoo.com,ausoma.forms.7116,,12/02/2025,emailDelivered,66ba570d99100a2a2a0b2f32,,691e40eef1a79e331f0fac85
 11/21/2025,Osaheni,Amadasu,2-PROSPECT,,,osaheniamadasu@yahoo.com,,,,smsDelivered,,,6920b62a8b6738008b087d94
 11/23/2025,Silvana,Harmsen,2-PROSPECT,September 2025,Clinical Medicine Program (CMP),s.harmsen2@buurtzorgnederland.com,ausoma.forms.7116,,12/02/2025,emailOpened,66ba570d99100a2a2a0b2f32,,6922e4f946b308d4af07f414
@@ -2526,7 +2531,7 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 12/24/2025,SIMPLICE,TAGNE,2-PROSPECT,2028 and Beyond,Clinical Medicine Program (CMP),simplice.tagne@yahoo.com,ausoma.forms.7116,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,,694c48efef432b09750a9a45
 12/25/2025,Happiness,Midaho,2-PROSPECT,,,midahohappy95@gmail.com,,,02/24/2026,emailOpened,,,694d8054912a0777d10f7a2e
 12/28/2025,Testdownload,MD,2-PROSPECT,January 2026,Clinical Medicine Program (CMP),deepti.mankar@ausoma.org,ausoma.forms.7172,,02/24/2026,emailOpened,66ba570d99100a2a2a0b2f32,,6950ac4207b57954db0a57b5
-12/31/2025,Kathomias,Turnage,3-APPL_START,,,katurnagemed1@gmail.com,,,02/24/2026,emailDelivered,,,6955217382739c97f00cc706
+12/31/2025,Kathomias,Turnage,3-APPL_START,May 2026,4 Year MD Program,katurnagemed1@gmail.com,,,02/24/2026,emailDelivered,,,6955217382739c97f00cc706
 01/01/2026,Saba,Mirzaeian Aghamahalli,3-APPL_START,September 2026,4 Year MD Program,saba.mirzaeian@yahoo.com,,,02/24/2026,emailOpened,,,6956ddbf176e63c8c10f6d85
 01/01/2026,ShanN,Smith,3-APPL_START,September 2026,,shannsmith0285@gmail.com,,,02/19/2026,smsDelivered,,,695708381a64a9a74d08adf8
 01/08/2026,David,Tran,3-APPL_START,September 2026,,berkeleypublichealth@gmail.com,,,02/19/2026,emailDelivered,66ba570d99100a2a2a0b2f32,Unresponsive,695f3accd8414506490a80b3
@@ -2549,11 +2554,11 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 03/04/2026,Sadie-Mae,Sparkes,2-PROSPECT,,,sparkessadiemae@gmail.com,,,03/17/2026,emailDelivered,,,69a7bcbcfcaf45d23f04527a
 03/06/2026,Anita,Bruce,2-PROSPECT,,,anitak0214@gmail.com,,,03/17/2026,emailDelivered,,,69ab218db74c96040d02179e
 03/07/2026,Todd,Bentley,2-PROSPECT,,,msksportdoc@hotmail.com,ausoma.forms.7116,,03/17/2026,emailDelivered,66ba570d99100a2a2a0b2f32,,69ac373baf86854d0a07e230
-03/10/2026,Iva,Hephzibah,3-APPL_START,September 2026,,irinetanjong@yahoo.com,,,,emailDelivered,,,69afaafd12613b388d05cfbc
+03/10/2026,Iva,Hephzibah,3-APPL_START,September 2026,5 Year Pre-Med MD Program,irinetanjong@yahoo.com,,,,emailDelivered,,,69afaafd12613b388d05cfbc
 03/11/2026,Becky,Mapon,2-PROSPECT,September 2026,4 Year MD Program,maponbecky@gmail.com,ausoma.forms.7116,,03/17/2026,emailOpened,66ba570d99100a2a2a0b2f32,,69b17fb5d4cedb42fc0cacfa
 03/19/2026,Summer,Scott,2-PROSPECT,May 2025,4 Year MD Program,summerscott250@gmail.com,,,,emailDelivered,,,69bc3d25edae74aba9092e05
 03/21/2026,samuel,velasquez,3-APPL_START,September 2026,5 Year Pre-Med MD Program,samuel12velas@gmail.com,,,,emailOpened,,,69beca99a406868198014198
-03/22/2026,Jessica,Olejniczak,3-APPL_START,September 2026,,olejjess@gmail.com,,,03/27/2026,emailDelivered,,,69c04aa3d4c4bbc67109c7ba
+03/22/2026,Jessica,Olejniczak,3-APPL_START,September 2026,4 Year MD Program,olejjess@gmail.com,,,03/27/2026,emailDelivered,,,69c04aa3d4c4bbc67109c7ba
 03/25/2026,Nicholas,Baumel,3-APPL_START,May 2026,4 Year MD Program,nbaumel@umich.edu,ausoma.forms.7116,,03/27/2026,emailOpened,66ba570d99100a2a2a0b2f32,,69c43d5a36896d73f90e0534
 03/30/2026,Juan Esteban,Posso Ramirez,2-PROSPECT,,,possoramirez@gmail.com,,,,emailDelivered,,,69cabade55015c4a1f033044
 04/02/2026,Asraa,Rizk,2-PROSPECT,May 2026,Clinical Medicine Program (CMP),asraarizk@gmail.com,ausoma.forms.7116,,04/07/2026,emailDelivered,66ba570d99100a2a2a0b2f32,,69ced4a7d6fd862f570d0db6
@@ -2562,16 +2567,16 @@ Created Date,First Name,Last Name,Active Stage,Intended Term,Intended Major,Emai
 04/12/2026,Selin,KIBRAC,2-PROSPECT,2028 and Beyond,4 Year MD Program,selinkibrac@gmail.com,ausoma.forms.7116,No one,,emailDelivered,66ba570d99100a2a2a0b2f32,,69daf6d6c73d91a73e0fd44d
 04/13/2026,Alexandre,Desmarais,2-PROSPECT,September 2026,4 Year MD Program,alexandre.desmarais82@gmail.com,ausoma.forms.7172,,,emailOpened,66ba570d99100a2a2a0b2f32,,69dc52e00242dafdcf04168a
 04/13/2026,Nadeen,Al shalabi,2-PROSPECT,,,nadeenshalabi8@gmail.com,,,,smsInboundReceived,,,69dd580e2b4296e2aa0e070b
-04/15/2026,Federico,Tontodonati,3-APPL_START,September 2026,,federicotontodonati2007@gmail.com,,,,smsDelivered,,,69df82edb461f722ab01bf0d
-04/17/2026,Korey,Tichenor,3-APPL_START,September 2026,,koreytichenor@proton.me,,,,userCreated,,,69e2aace0e93d40a1e06bab3
-04/18/2026,Anna,Burchette,3-APPL_START,September 2026,,annaburchette@icloud.com,,,,emailDelivered,,,69e3dbf8ad09c3785e0483ff
-04/20/2026,noura,ghattas,4-APPL_SUBMIT,September 2026,,nouraghattas16@gmail.com,,,,pageview,,,69e6b84d67b49ad926045d61
-04/21/2026,Deborah,Adeyemo,3-APPL_START,September 2026,,deborahadeyemo23@gmail.com,,,,userLogin,,,69e7740390dc5cf4a7046e36
+04/15/2026,Federico,Tontodonati,3-APPL_START,September 2026,5 Year Pre-Med MD Program,federicotontodonati2007@gmail.com,,,,smsDelivered,,,69df82edb461f722ab01bf0d
+04/17/2026,Korey,Tichenor,3-APPL_START,September 2026,5 Year Pre-Med MD Program,koreytichenor@proton.me,,,,userCreated,,,69e2aace0e93d40a1e06bab3
+04/18/2026,Anna,Burchette,3-APPL_START,September 2026,Clinical Medicine Program (CMP),annaburchette@icloud.com,,,,emailDelivered,,,69e3dbf8ad09c3785e0483ff
+04/20/2026,noura,ghattas,4-APPL_SUBMIT,September 2026,5 Year Pre-Med MD Program,nouraghattas16@gmail.com,,,,pageview,,,69e6b84d67b49ad926045d61
+04/21/2026,Deborah,Adeyemo,3-APPL_START,September 2026,4 Year MD Program,deborahadeyemo23@gmail.com,,,,userLogin,,,69e7740390dc5cf4a7046e36
 04/22/2026,Jeff,Agyei,1-SUSPECT,,,jeop0026@ausoma.org,,,,userCreated,,,69e8203f151413b85203eb17
 04/24/2026,Dr. Judith,Williams,2-PROSPECT,2028 and Beyond,4 Year MD Program,0621judyw@gmail.com,ausoma.forms.7116,N/A,,emailOpened,66ba570d99100a2a2a0b2f32,,69eab4693940f110d904ab75
 04/24/2026,Asad,Ali,2-PROSPECT,2028 and Beyond,4 Year MD Program,asad9272@gmail.com,ausoma.forms.7116,,,emailDelivered,66ba570d99100a2a2a0b2f32,,69eaf9ab540fa0cce10a11a4
 04/26/2026,Christian,Ndjoli Cuba,2-PROSPECT,May 2026,Clinical Medicine Program (CMP),c.ndjolicuba@hotmail.com,,,,emailOpened,,,69edc5a9611c650a650fbd93
-04/27/2026,GreatDivine,Oguchi,3-APPL_START,September 2026,,dovewings247@gmail.com,,,,userLogin,,,69ef097c0091b89640063df7
+04/27/2026,GreatDivine,Oguchi,3-APPL_START,September 2026,Clinical Medicine Program (CMP),dovewings247@gmail.com,,,,userLogin,,,69ef097c0091b89640063df7
 05/14/2026,Michael,Almonte,4-APPL_SUBMIT,September 2026,4 Year MD Program,mikealmonte@icloud.com,,,,pageview,,,6a053b69643e59b4150cbf47
 05/14/2026,MAHI,DAVE,2-PROSPECT,,,bhaskardave27@gmail.com,,,,userCreated,,,6a0602c06b3382fcfe0e8e9c
 05/14/2026,Dipak,Jani,1-SUSPECT,,,janiusa3695@gmail.com,,,,emailOpened,,,6a0602c16da13337f90b2307
@@ -2806,6 +2811,43 @@ const VIEWS = {
 let RAW = [];          // all rows
 let donutChart = null;
 let selectedCell = null; // { term: 'May 2026', stage: '5-ADMIT' } or null
+// Lead-table sort state. null = use the contextual default (Created Date DESC
+// when a View is active, otherwise Stage DESC → Term ASC → Created Date DESC).
+// Set to { col, dir } when the user clicks a column header.
+let userSort = null;
+// Per-column natural direction used the first time a header is clicked.
+// Dates/Stage default to DESC (most recent / most-progressed first); text
+// columns default to ASC (alphabetical). Subsequent clicks on the same column
+// toggle between asc and desc.
+const SORT_DEFAULT_DIR = {
+  'Created Date':   'desc',
+  'Last Activity':  'desc',
+  'Active Stage':   'desc',
+  'Intended Term':  'asc',
+  'Last Name':      'asc',
+  'First Name':     'asc',
+  'Intended Major': 'asc',
+  'Referred By':    'asc',
+};
+function compareRows(a, b, col, dir) {
+  let va, vb;
+  if (col === 'Active Stage') {
+    va = STAGE_ORDER[a[col]] ?? -1;
+    vb = STAGE_ORDER[b[col]] ?? -1;
+  } else if (col === 'Intended Term') {
+    va = parseTerm(a[col]).sortKey;
+    vb = parseTerm(b[col]).sortKey;
+  } else if (col === 'Created Date' || col === 'Last Activity') {
+    va = (parseUSDate(a[col]) || new Date(0)).getTime();
+    vb = (parseUSDate(b[col]) || new Date(0)).getTime();
+  } else {
+    va = (a[col] || '').toString().toLowerCase();
+    vb = (b[col] || '').toString().toLowerCase();
+  }
+  if (va < vb) return dir === 'asc' ? -1 : 1;
+  if (va > vb) return dir === 'asc' ? 1 : -1;
+  return 0;
+}
 
 const els = {
   view: document.getElementById('fView'),
@@ -3248,17 +3290,35 @@ function renderLeads(filtered) {
       return true;
     });
   }
-  // Default sort: by Stage DESCENDING (7-Enroll first, then 6-Deposit, ..., 1-Suspect last).
+  // Sort selection:
+  //   1. If the user clicked a column header → use userSort.
+  //   2. Else if a View is active → default to Created Date DESC (newest first).
+  //   3. Else → original default: Stage DESC, then Intended Term ASC, then Created Date DESC.
   // CONDITIONAL_5-ADMIT slots alongside 5-ADMIT via STAGE_ORDER.
-  // Within a stage, sort by Intended Term (chronological), then Created Date (newest first).
-  rows = rows.slice().sort((a, b) => {
-    const sa = STAGE_ORDER[a['Active Stage']] ?? -1;
-    const sb = STAGE_ORDER[b['Active Stage']] ?? -1;
-    if (sa !== sb) return sb - sa;
-    const ta = parseTerm(a['Intended Term']).sortKey;
-    const tb = parseTerm(b['Intended Term']).sortKey;
-    if (ta !== tb) return ta - tb;
-    return (parseUSDate(b['Created Date']) || 0) - (parseUSDate(a['Created Date']) || 0);
+  let activeSort = null;
+  if (userSort) {
+    activeSort = userSort;
+    rows = rows.slice().sort((a, b) => compareRows(a, b, userSort.col, userSort.dir));
+  } else if (els.view.value) {
+    activeSort = { col: 'Created Date', dir: 'desc' };
+    rows = rows.slice().sort((a, b) => compareRows(a, b, 'Created Date', 'desc'));
+  } else {
+    rows = rows.slice().sort((a, b) => {
+      const sa = STAGE_ORDER[a['Active Stage']] ?? -1;
+      const sb = STAGE_ORDER[b['Active Stage']] ?? -1;
+      if (sa !== sb) return sb - sa;
+      const ta = parseTerm(a['Intended Term']).sortKey;
+      const tb = parseTerm(b['Intended Term']).sortKey;
+      if (ta !== tb) return ta - tb;
+      return (parseUSDate(b['Created Date']) || 0) - (parseUSDate(a['Created Date']) || 0);
+    });
+  }
+  // Paint sort arrows on the column headers.
+  document.querySelectorAll('#leadsTable thead th[data-sort]').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (activeSort && th.dataset.sort === activeSort.col) {
+      th.classList.add(activeSort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
   });
 
   els.leadCount.textContent = `${rows.length.toLocaleString()} lead${rows.length === 1 ? '' : 's'}`;
