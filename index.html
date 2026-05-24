@@ -283,7 +283,7 @@ footer.confidential-footer { margin-top:8px; padding:10px 22px; border-top:1px s
      UTC ISO time the Element451 fetch ran. Stays "NOT_YET_SET" if a build
      somehow shipped without substitution; the dashboard falls back to page
      load time in that case. -->
-<script id="data-refreshed-at" type="application/json">"2026-05-24T20:45:22.658162+00:00"</script>
+<script id="data-refreshed-at" type="application/json">"2026-05-24T21:15:40.871199+00:00"</script>
 
 <!-- Bootstrap data: embedded Element451 export -->
 <script type="text/csv" id="bootstrap-csv">
@@ -3369,7 +3369,27 @@ function escapeAttr(s) { return escapeHtml(s); }
 // ---------- EVENTS ----------
 ['change','input'].forEach(ev => {
   ['fView','fName','fTerm','fStage','fMajor','fFrom','fTo'].forEach(id => {
-    document.getElementById(id).addEventListener(ev, () => { selectedCell = null; render(); });
+    document.getElementById(id).addEventListener(ev, (e) => {
+      selectedCell = null;
+      // Changing the View dropdown wipes any per-column sort the user set, so
+      // the new View shows its natural default (Created Date DESC).
+      if (e.target.id === 'fView') userSort = null;
+      render();
+    });
+  });
+});
+// Column-header click → set the lead-list sort. First click on a column uses
+// the natural direction for that column (DESC for dates/Stage, ASC for text);
+// repeat clicks on the same column toggle asc/desc.
+document.querySelectorAll('#leadsTable thead th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.sort;
+    if (userSort && userSort.col === col) {
+      userSort = { col, dir: userSort.dir === 'asc' ? 'desc' : 'asc' };
+    } else {
+      userSort = { col, dir: SORT_DEFAULT_DIR[col] || 'asc' };
+    }
+    render();
   });
 });
 els.reset.addEventListener('click', () => {
@@ -3384,6 +3404,7 @@ els.reset.addEventListener('click', () => {
     els.to.value = isoDate(dates[dates.length-1]);
   }
   selectedCell = null;
+  userSort = null;
   render();
 });
 els.clearCell.addEventListener('click', () => { selectedCell = null; render(); });
